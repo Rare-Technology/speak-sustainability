@@ -487,7 +487,32 @@
   .case-card:focus-within .case-media{opacity:1}
   /* Below the wide breakpoint the reveal copy fills the smaller cards; drop the
      illustration there so it can't collide with the text (matches Change Agent). */
-  @media (max-width:1024px){ .case-media{display:none} }
+  @media (max-width:1024px){
+    .case-media{display:none}
+
+    /* Small breakpoints: swap the 3-up grid for a horizontal scroll-snap carousel
+       of smaller cards (like Change Agent's Use Cases). Full-bleed so the track
+       scrolls edge-to-edge; the next card peeks to signal there's more to swipe. */
+    .cases-grid{
+      display:flex;align-items:stretch;
+      gap:var(--rare-space-4);
+      overflow-x:auto;overflow-y:hidden;
+      scroll-snap-type:x mandatory;
+      -webkit-overflow-scrolling:touch;
+      scrollbar-width:none;                                   /* Firefox */
+      padding-block:var(--rare-space-1);                      /* room for the focus ring */
+      /* cancel the container's inline padding so the track reaches the screen edges */
+      margin-inline:calc(-1 * var(--rare-space-6));
+      padding-inline:var(--rare-space-6);
+      scroll-padding-inline:var(--rare-space-6);
+    }
+    .cases-grid::-webkit-scrollbar{display:none}              /* Safari/Chrome */
+    .cases-grid > .case-card{
+      flex:0 0 auto;
+      width:clamp(240px, 74vw, 300px);                        /* smaller than the desktop 3-up card */
+      scroll-snap-align:start;
+    }
+  }
   .case-card > :where(.case-title, .case-desc, .case-reveal){position:relative;z-index:var(--rare-elevation-z-raised)}
 
   /* ============================================================
