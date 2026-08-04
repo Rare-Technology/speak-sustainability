@@ -491,7 +491,56 @@
   .case-card > :where(.case-title, .case-desc, .case-reveal){position:relative;z-index:var(--rare-elevation-z-raised)}
 
   /* ============================================================
-     §5  SIGN UP
+     §5  PRINCIPLES  (8 cards: 4-up → 2-up → 1-up)
+     ============================================================ */
+  .principles{background:var(--rare-color-background-default);padding-block:var(--rare-space-11)}
+  .principles-head{margin-bottom:var(--rare-space-7)}
+  .principles-head .section-heading{max-width:720px}   /* ~2/3 of the content width; fills the column when narrower */
+  .principles-grid{
+    display:grid;grid-template-columns:1fr;gap:var(--rare-space-5);
+    list-style:none;align-items:stretch;      /* cards in a row share height */
+  }
+  @media (min-width:640px){ .principles-grid{grid-template-columns:repeat(2, 1fr)} }
+  @media (min-width:1025px){ .principles-grid{grid-template-columns:repeat(4, 1fr)} }
+  .principles-grid > li{display:flex}          /* let the button fill the row height */
+  /* Card is a button that opens the principle's detail dialog. */
+  .principle-card{
+    display:flex;gap:var(--rare-space-4);align-items:flex-start;
+    width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer;
+    background:var(--rare-color-background-default);
+    border:var(--rare-border-width-default) solid var(--rare-color-border-default);
+    border-radius:var(--rare-radius-card);
+    padding:var(--rare-space-5);
+    transition:border-color var(--rare-motion-duration-fast) var(--rare-motion-easing-standard),
+               box-shadow var(--rare-motion-duration-fast) var(--rare-motion-easing-standard),
+               transform var(--rare-motion-duration-fast) var(--rare-motion-easing-standard);
+  }
+  .principle-card:hover{
+    border-color:var(--rare-color-border-strong);
+    box-shadow:0 6px 20px rgba(26,29,31,.08);
+    transform:translateY(-2px);
+  }
+  .principle-card:focus-visible{
+    outline:var(--rare-border-width-focus) solid var(--rare-color-focus-ring);
+    outline-offset:var(--rare-border-offset-focus);
+  }
+  /* Tinted square icon tile — rounded to match the card language. */
+  .principle-ico{
+    flex:0 0 auto;width:44px;height:44px;display:block;
+    border-radius:var(--rare-radius-md);
+  }
+  .principle-text{
+    font-size:var(--rare-font-size-300);
+    line-height:var(--rare-line-height-normal);
+    color:var(--rare-color-text-muted);       /* completion copy is the lighter colour */
+  }
+  .principle-text strong{
+    color:var(--rare-color-text-default);      /* the leading phrase is bold + full-strength ink */
+    font-weight:var(--rare-font-weight-bold);
+  }
+
+  /* ============================================================
+     §6  SIGN UP
      ============================================================ */
   .signup{background:var(--rare-color-background-muted);padding-block:var(--rare-space-11)}
   .signup-head{margin-bottom:var(--rare-space-7)}
@@ -631,6 +680,67 @@
     font-size:var(--rare-font-size-500);margin-top:var(--rare-space-6);
   }
   .doc-contact a{color:var(--rare-color-action-primary)}
+
+  /* ============================================================
+     §8  PRINCIPLE DETAIL MODAL  (native <dialog>; content swapped
+     in on click. Shares the backdrop/scroll-lock behaviour of the
+     file preview modal above.)
+     ============================================================ */
+  .principle-modal{
+    padding:0;border:none;margin:auto;
+    width:min(92vw, 520px);
+    max-height:86vh;
+    border-radius:var(--rare-radius-lg);
+    overflow:hidden;
+    background:var(--rare-color-background-default);
+    color:var(--rare-color-text-default);
+    box-shadow:0 24px 60px rgba(26,29,31,.32);
+  }
+  .principle-modal[open]{display:flex;flex-direction:column}
+  .principle-modal::backdrop{background:rgba(26,29,31,.55)}
+  .principle-modal-bar{
+    flex:0 0 auto;display:flex;justify-content:flex-end;
+    padding:var(--rare-space-3) var(--rare-space-3) 0;
+  }
+  .principle-modal-close{
+    width:var(--rare-size-control-md);height:var(--rare-size-control-md);
+    display:grid;place-items:center;cursor:pointer;
+    background:var(--rare-color-background-default);
+    border:var(--rare-border-width-default) solid var(--rare-color-border-strong);
+    border-radius:var(--rare-radius-pill);color:var(--rare-color-text-default);
+    transition:background var(--rare-motion-duration-fast) var(--rare-motion-easing-standard);
+  }
+  .principle-modal-close:hover{background:var(--rare-color-background-muted)}
+  .principle-modal-close svg{width:20px;height:20px}
+  .principle-modal-body{
+    flex:1 1 auto;overflow-y:auto;
+    padding:0 clamp(var(--rare-space-6), 4vw, var(--rare-space-8)) var(--rare-space-8);
+  }
+  .principle-modal-ico{
+    width:64px;height:64px;display:block;
+    border-radius:var(--rare-radius-md);margin-bottom:var(--rare-space-4);
+  }
+  .principle-modal-eyebrow{
+    font-family:var(--rare-font-family-display);font-weight:var(--rare-font-weight-bold);
+    text-transform:uppercase;letter-spacing:.04em;
+    font-size:var(--rare-font-size-200);color:var(--rare-color-action-primary);
+    margin-bottom:var(--rare-space-1);
+  }
+  .principle-modal-title{
+    font-family:var(--rare-font-family-display);font-weight:var(--rare-font-weight-extrabold);
+    font-size:var(--rare-font-size-600);line-height:var(--rare-line-height-tight);
+    margin-bottom:var(--rare-space-3);
+  }
+  .principle-modal-text{
+    color:var(--rare-color-text-muted);
+    line-height:var(--rare-line-height-relaxed);
+  }
+  /* Citation links (open in a new tab) — coloured + underlined so they read as links. */
+  .principle-modal-text a{
+    color:var(--rare-color-action-primary);
+    text-decoration:underline;text-underline-offset:2px;
+  }
+  .principle-modal-text a:hover{text-decoration:none}
 
   @media (prefers-reduced-motion:reduce){
     *{scroll-behavior:auto !important;transition:none !important}
@@ -863,7 +973,7 @@
   <section class="cases" aria-labelledby="cases-heading">
     <div class="container">
       <div class="cases-head">
-        <p class="eyebrow eyebrow--feature">Use Cases</p>
+        <p class="eyebrow">Use Cases</p>
         <h2 class="section-heading" id="cases-heading">
           Speak Sustainability levels up your communications at key points in your process.
         </h2>
@@ -895,7 +1005,94 @@
     </div>
   </section>
 
-  <!-- ============================ §5 SIGN UP ============================ -->
+  <!-- ============================ §5 PRINCIPLES ============================ -->
+  <!-- 8 principle cards, 2×4 at the widest breakpoint → 2-up → 1-up.
+       NOTE: these are static for now. Planned enhancement — make each card a
+       trigger that opens a detail dialog with descriptive copy (Apple "Why Apple
+       is the best place to shop Mac." style). Structured as a list so a <button>
+       wrapper / dialog can be layered on later without reflowing the markup. -->
+  <section class="principles" aria-labelledby="principles-heading">
+    <div class="container">
+      <div class="principles-head">
+        <p class="eyebrow">Principles</p>
+        <h2 class="section-heading" id="principles-heading">
+          The guidance is based on 8 principles grounded in science.
+        </h2>
+      </div>
+
+      <!-- Each card is a button that opens the shared #principle-modal with the
+           principle's detail copy (kept in the hidden .principle-detail sibling,
+           so it stays in the DOM). Interaction akin to Apple's "Why Apple…" cards. -->
+      <ul class="principles-grid" role="list">
+        <li>
+          <button class="principle-card" type="button" aria-haspopup="dialog" aria-controls="principle-modal">
+            <img class="principle-ico" src="assets/principle-personal.webp" alt="" aria-hidden="true"
+                 width="44" height="44" loading="lazy" decoding="async" />
+            <span class="principle-text"><strong>Make it personal.</strong> Make it about people, not the environment.</span>
+          </button>
+          <p class="principle-detail" hidden>Focus on people rather than planetary abstractions — <a href="https://climatecommunication.yale.edu/publications/personal-climate-stories-can-persuade/" target="_blank" rel="noopener noreferrer">how they and their families are already experiencing climate impacts</a>. Connect distant issues to <a href="https://www.nature.com/articles/nclimate2760" target="_blank" rel="noopener noreferrer">local concerns</a> like flooding, air quality, and outdoor recreation, and highlight personal benefits such as <a href="https://www.pnas.org/content/112/6/E510" target="_blank" rel="noopener noreferrer">health</a>, <a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3576266" target="_blank" rel="noopener noreferrer">cost savings</a>, and <a href="https://www.sciencedirect.com/science/article/abs/pii/S0965856419300060" target="_blank" rel="noopener noreferrer">appealing technology like electric vehicles</a>.</p>
+        </li>
+        <li>
+          <button class="principle-card" type="button" aria-haspopup="dialog" aria-controls="principle-modal">
+            <img class="principle-ico" src="assets/principle-accessible.webp" alt="" aria-hidden="true"
+                 width="44" height="44" loading="lazy" decoding="async" />
+            <span class="principle-text"><strong>Make it accessible.</strong> Simple, clear messages, repeated often.</span>
+          </button>
+          <p class="principle-detail" hidden>Use <a href="https://www.ted.com/talks/john_marshall_3_strategies_for_effectively_talking_about_climate_change/transcript?language=en" target="_blank" rel="noopener noreferrer">relatable language your audience already understands</a>. Swap <a href="https://link.springer.com/article/10.1007/s10584-021-03183-0" target="_blank" rel="noopener noreferrer">technical jargon</a> for everyday terms — “overheating” instead of global warming, “extreme weather” instead of changing climate. <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4183170/" target="_blank" rel="noopener noreferrer">Tell stories</a> and find creative angles. Conservative audiences respond well to frames built around <a href="https://link.springer.com/article/10.1007/s10584-014-1192-2" target="_blank" rel="noopener noreferrer">clean and healthy air</a>, job creation, and <a href="https://journals.sagepub.com/doi/10.1177/1075547019860847" target="_blank" rel="noopener noreferrer">stewardship</a>.</p>
+        </li>
+        <li>
+          <button class="principle-card" type="button" aria-haspopup="dialog" aria-controls="principle-modal">
+            <img class="principle-ico" src="assets/principle-empowering.webp" alt="" aria-hidden="true"
+                 width="44" height="44" loading="lazy" decoding="async" />
+            <span class="principle-text"><strong>Make it empowering.</strong> Direct emotions towards solutions.</span>
+          </button>
+          <p class="principle-detail" hidden>Direct emotions toward solutions rather than despair. Acknowledge the severity, but emphasize optimistic pathways forward — doom-focused messaging tends to create <a href="https://journals.sagepub.com/doi/abs/10.1177/1075547008329201" target="_blank" rel="noopener noreferrer">anxiety</a> and disengagement. Channel emotions like <a href="https://www.sciencedirect.com/science/article/abs/pii/S0272494421000931" target="_blank" rel="noopener noreferrer">anger</a>, <a href="https://journals.sagepub.com/doi/abs/10.1177/1075547018776019" target="_blank" rel="noopener noreferrer">hope</a>, and <a href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0188781" target="_blank" rel="noopener noreferrer">pride</a> constructively by showing people solutions and connecting challenges to actions they can take.</p>
+        </li>
+        <li>
+          <button class="principle-card" type="button" aria-haspopup="dialog" aria-controls="principle-modal">
+            <img class="principle-ico" src="assets/principle-doable.webp" alt="" aria-hidden="true"
+                 width="44" height="44" loading="lazy" decoding="async" />
+            <span class="principle-text"><strong>Make it doable.</strong> Meet people where they are. Help them take gradual steps.</span>
+          </button>
+          <p class="principle-detail" hidden>Build <a href="https://www.nature.com/articles/s41558-018-0371-y" target="_blank" rel="noopener noreferrer">self-efficacy</a> by pointing people toward <a href="https://iopscience.iop.org/article/10.1088/1748-9326/aa7541" target="_blank" rel="noopener noreferrer">high-impact actions</a> they can realistically take. Meet people where they are rather than demanding immediate transformation, and suggest gradual steps that fit their circumstances instead of <a href="https://www.sciencedirect.com/science/article/pii/S0272494421000451" target="_blank" rel="noopener noreferrer">expecting everyone to adopt extreme changes at once</a>.</p>
+        </li>
+        <li>
+          <button class="principle-card" type="button" aria-haspopup="dialog" aria-controls="principle-modal">
+            <img class="principle-ico" src="assets/principle-collective.webp" alt="" aria-hidden="true"
+                 width="44" height="44" loading="lazy" decoding="async" />
+            <span class="principle-text"><strong>Make it collective.</strong> People must see themselves as part of a larger group.</span>
+          </button>
+          <p class="principle-detail" hidden>Solving climate change takes “<a href="https://drawdown.org/news/insights/the-powerful-role-of-household-actions-in-solving-climate-change" target="_blank" rel="noopener noreferrer">all solutions on deck</a>” collaboration across society. Help people <a href="https://www.sciencedirect.com/science/article/abs/pii/S0272494415000237" target="_blank" rel="noopener noreferrer">see themselves as part of a larger group taking action</a>, rather than placing blame on individuals — which only creates guilt and shame.</p>
+        </li>
+        <li>
+          <button class="principle-card" type="button" aria-haspopup="dialog" aria-controls="principle-modal">
+            <img class="principle-ico" src="assets/principle-normal.webp" alt="" aria-hidden="true"
+                 width="44" height="44" loading="lazy" decoding="async" />
+            <span class="principle-text"><strong>Make it normal.</strong> Show that more and more people are engaging.</span>
+          </button>
+          <p class="principle-detail" hidden>Show that climate-friendly behaviors are widespread and socially valued. Share examples of <a href="https://journals.sagepub.com/doi/full/10.1177/0956797617719950" target="_blank" rel="noopener noreferrer">people already engaged in these practices</a> and highlight <a href="https://journals.sagepub.com/doi/abs/10.1177/0956797617719950" target="_blank" rel="noopener noreferrer">rising adoption</a>. Avoid <a href="https://www.sciencedirect.com/science/article/abs/pii/S0065260108603305" target="_blank" rel="noopener noreferrer">discouraging statistics that suggest low participation</a>, which signals the behavior is uncommon.</p>
+        </li>
+        <li>
+          <button class="principle-card" type="button" aria-haspopup="dialog" aria-controls="principle-modal">
+            <img class="principle-ico" src="assets/principle-trustworthy.webp" alt="" aria-hidden="true"
+                 width="44" height="44" loading="lazy" decoding="async" />
+            <span class="principle-text"><strong>Make it trustworthy.</strong> Bring in trusted, beloved, relatable messengers.</span>
+          </button>
+          <p class="principle-detail" hidden>Choose messengers carefully, prioritizing people who are <a href="https://www.science.org/doi/10.1126/science.1207055" target="_blank" rel="noopener noreferrer">relatable</a> and diverse and can <a href="https://www.nature.com/articles/s41586-018-0647-4" target="_blank" rel="noopener noreferrer">model the behavior convincingly</a>. <a href="https://climatecommunication.yale.edu/publications/global-warming-ccam-march-2015/" target="_blank" rel="noopener noreferrer">Climate scientists and immediate family members</a> are among the most trusted sources, so other messengers should focus on listening and modeling rather than claiming expertise.</p>
+        </li>
+        <li>
+          <button class="principle-card" type="button" aria-haspopup="dialog" aria-controls="principle-modal">
+            <img class="principle-ico" src="assets/principle-everyone.webp" alt="" aria-hidden="true"
+                 width="44" height="44" loading="lazy" decoding="async" />
+            <span class="principle-text"><strong>Make it for everyone.</strong> Focus on commonalities instead of differences.</span>
+          </button>
+          <p class="principle-detail" hidden>Emphasize what audiences have in common rather than what divides them. Because the <a href="https://iopscience.iop.org/article/10.1088/1748-9326/ac2966" target="_blank" rel="noopener noreferrer">consensus is strong</a>, avoid <a href="https://kiej.georgetown.edu/dont-feed-trolls-bold-climate-action-new-golden-age-denialism/" target="_blank" rel="noopener noreferrer">amplifying denial arguments unnecessarily</a>. When you do address misinformation, frame it as something <a href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0118489" target="_blank" rel="noopener noreferrer">only a small share of people believe</a> rather than giving disagreement undue prominence.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================ §6 SIGN UP ============================ -->
   <section class="signup" id="signup" aria-labelledby="signup-heading">
     <div class="container">
       <div class="signup-head">
@@ -944,7 +1141,7 @@
           <img src="assets/speak-sustainability-logo.svg" alt="Speak Sustainability" width="201" height="26" />
         </a>
         <p class="footer-tag">
-          <strong>Created by <a href="https://rare.org">Rare</a>.</strong> Grounded in peer-reviewed behavioral science.
+          <strong>Created by <a href="https://rare.org">Rare</a>.</strong> Grounded in behavioral and communications science.
         </p>
       </div>
 
@@ -993,6 +1190,21 @@
       <h2 class="doc-h">Media Contact</h2>
       <p class="doc-contact">Sarah Kim<br>Director of Communications, PowerLoop Technologies<br><a href="mailto:press@powerlooptech.com">press@powerlooptech.com</a><br>(512) 555-0142</p>
     </article>
+  </div>
+</dialog>
+
+<!-- ==================== PRINCIPLE DETAIL MODAL (shared; populated on click) ==================== -->
+<dialog class="principle-modal" id="principle-modal" aria-labelledby="principle-modal-title">
+  <div class="principle-modal-bar">
+    <button type="button" class="principle-modal-close" data-close aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="principle-modal-body">
+    <img class="principle-modal-ico" id="principle-modal-ico" src="" alt="" aria-hidden="true" width="64" height="64" />
+    <p class="principle-modal-eyebrow">Principle</p>
+    <h3 class="principle-modal-title" id="principle-modal-title"></h3>
+    <p class="principle-modal-text" id="principle-modal-text"></p>
   </div>
 </dialog>
 
@@ -1188,6 +1400,69 @@
     // stops any native close so our cleanup (scroll lock + focus) always runs.
     dlg.addEventListener("cancel", function(e){ e.preventDefault(); close(); });
     dlg.addEventListener("keydown", function(e){
+      if(e.key === "Escape" || e.key === "Esc"){ e.preventDefault(); close(); }
+    });
+  })();
+
+  /* ---------------------------------------------------------
+     PRINCIPLE CARDS — each card is a button that opens the shared
+     #principle-modal, populated from the card (title/icon) and its
+     hidden .principle-detail sibling. Apple "Why Apple…"-style reveal.
+     Same close/backdrop/scroll-lock/focus-restore as the preview modal.
+     --------------------------------------------------------- */
+  (function principleModal(){
+    var modal = document.getElementById("principle-modal");
+    if(!modal || typeof modal.showModal !== "function") return;
+    var titleEl = document.getElementById("principle-modal-title");
+    var textEl  = document.getElementById("principle-modal-text");
+    var icoEl   = document.getElementById("principle-modal-ico");
+    var bodyEl  = modal.querySelector(".principle-modal-body");
+    var closeBtn = modal.querySelector("[data-close]");
+    var cards = document.querySelectorAll(".principle-card");
+    var lastTrigger = null;
+
+    function open(card){
+      var li = card.closest("li");
+      var strong = card.querySelector(".principle-text strong");
+      var detail = li && li.querySelector(".principle-detail");
+      var img = card.querySelector(".principle-ico");
+      // title = the leading bold phrase, minus its trailing period
+      titleEl.textContent = strong ? strong.textContent.replace(/\s*\.\s*$/, "") : "";
+      // detail is author-controlled static markup (with citation links) — render it
+      if(detail){ textEl.innerHTML = detail.innerHTML; } else { textEl.textContent = ""; }
+      if(img){ icoEl.src = img.currentSrc || img.src; }
+      lastTrigger = card;
+      modal.showModal();
+      document.body.classList.add("modal-open");
+      if(bodyEl) bodyEl.scrollTop = 0;
+    }
+    // Do the teardown here (not in a 'close' event listener): some engines don't
+    // reliably fire dialog 'close' on a programmatic .close(), which would leave
+    // the scroll lock stuck. Every close path routes through here.
+    function close(){
+      modal.close();
+      document.body.classList.remove("modal-open");
+      if(lastTrigger) lastTrigger.focus();
+    }
+
+    cards.forEach(function(card){
+      card.addEventListener("click", function(){ open(card); });
+    });
+    if(closeBtn) closeBtn.addEventListener("click", close);
+
+    modal.addEventListener("click", function(e){
+      var r = modal.getBoundingClientRect();
+      var inside = e.clientX >= r.left && e.clientX <= r.right &&
+                   e.clientY >= r.top  && e.clientY <= r.bottom;
+      if(!inside) close();
+    });
+    // Backstop for any native close (e.g. engines that do fire it).
+    modal.addEventListener("close", function(){
+      document.body.classList.remove("modal-open");
+      if(lastTrigger) lastTrigger.focus();
+    });
+    modal.addEventListener("cancel", function(e){ e.preventDefault(); close(); });
+    modal.addEventListener("keydown", function(e){
       if(e.key === "Escape" || e.key === "Esc"){ e.preventDefault(); close(); }
     });
   })();
