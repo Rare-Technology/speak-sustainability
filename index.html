@@ -301,13 +301,22 @@
   .chat-msg em{font-style:italic}
   /* Small lighter status line — "All 8 passes complete…" */
   .chat-meta{color:var(--rare-color-text-muted);font-size:.83em}
-  /* Attached-file chip inside the user bubble */
+  /* Attached-file chip inside the user bubble — a button that opens the doc preview */
   .chat-file{
     display:inline-flex;align-items:center;gap:.44em;
     margin-top:.5em;padding:.33em .61em;
     background:var(--rare-color-background-default);
     border:var(--rare-border-width-default) solid var(--rare-color-border-default);
     border-radius:.5em;color:var(--rare-color-text-muted);font-size:.83em;
+    font-family:inherit;line-height:inherit;cursor:pointer;text-align:left;
+    transition:background var(--rare-motion-duration-fast) var(--rare-motion-easing-standard),
+               border-color var(--rare-motion-duration-fast) var(--rare-motion-easing-standard),
+               color var(--rare-motion-duration-fast) var(--rare-motion-easing-standard);
+  }
+  .chat-file:hover{
+    background:var(--rare-color-background-muted);
+    border-color:var(--rare-color-border-strong);
+    color:var(--rare-color-text-default);
   }
   .chat-file-ico{font-size:1.1em;line-height:1}
 
@@ -339,7 +348,7 @@
      ============================================================ */
   .how{background:var(--rare-color-background-muted);padding-block:var(--rare-space-11)}
   .how-head{margin-bottom:var(--rare-space-7)}
-  .how-head .section-heading{max-width:36ch}
+  .how-head .section-heading{max-width:720px}   /* ~2/3 of the content width; fills the column when narrower */
   .accordion{
     max-width:640px;                 /* reading measure — layout constant */
     margin:0 auto;
@@ -396,7 +405,7 @@
      ============================================================ */
   .cases{background:var(--rare-color-background-subtle);padding-block:var(--rare-space-11)}
   .cases-head{margin-bottom:var(--rare-space-7)}
-  .cases-head .section-heading{max-width:36ch}
+  .cases-head .section-heading{max-width:720px}   /* ~2/3 of the content width; fills the column when narrower */
   .cases-grid{
     display:grid;
     grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));
@@ -442,7 +451,7 @@
      ============================================================ */
   .signup{background:var(--rare-color-background-muted);padding-block:var(--rare-space-11)}
   .signup-head{margin-bottom:var(--rare-space-7)}
-  .signup-head .section-heading{max-width:none}
+  .signup-head .section-heading{max-width:720px}   /* ~2/3 of the content width; fills the column when narrower */
   .signup-head .lead-strong{color:var(--rare-color-action-primary)}
   .waitlist{max-width:720px;margin-inline:auto;display:grid;gap:var(--rare-space-5)}
   .field{display:flex;flex-direction:column;gap:var(--rare-space-2)}
@@ -498,6 +507,75 @@
     border-top:var(--rare-border-width-default) solid var(--rare-color-border-default);
     color:var(--rare-color-text-muted);font-size:var(--rare-font-size-200);
   }
+
+  /* ============================================================
+     §7  FILE PREVIEW MODAL  (native <dialog>, opened from the
+     chat card's file chip). Lives at body level so it renders at
+     normal page scale, not the em-scaled chat card scale.
+     ============================================================ */
+  .doc-preview{
+    padding:0;border:none;
+    margin:auto;                     /* restore native centering (global *{margin:0} clears it) */
+    width:min(92vw, 720px);
+    max-height:86vh;
+    border-radius:var(--rare-radius-lg);
+    overflow:hidden;                 /* clip the sticky bar to the rounded corners */
+    background:var(--rare-color-background-default);
+    color:var(--rare-color-text-default);
+    box-shadow:0 24px 60px rgba(26,29,31,.32);   /* modal elevation */
+  }
+  .doc-preview[open]{display:flex;flex-direction:column}   /* override native block */
+  .doc-preview::backdrop{background:rgba(26,29,31,.55)}
+  body.modal-open{overflow:hidden}
+  /* Title bar — filename + close control, fixed above the scrolling body */
+  .doc-preview-bar{
+    flex:0 0 auto;
+    display:flex;align-items:center;justify-content:space-between;gap:var(--rare-space-4);
+    padding:var(--rare-space-3) var(--rare-space-4) var(--rare-space-3) var(--rare-space-5);
+    background:var(--rare-color-background-muted);
+    border-bottom:var(--rare-border-width-default) solid var(--rare-color-border-default);
+  }
+  .doc-preview-name{
+    display:inline-flex;align-items:center;gap:var(--rare-space-2);min-width:0;
+    font-family:var(--rare-font-family-text);font-weight:var(--rare-font-weight-semibold);
+    font-size:var(--rare-font-size-300);color:var(--rare-color-text-default);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
+  .doc-preview-close{
+    flex:0 0 auto;
+    width:var(--rare-size-control-md);height:var(--rare-size-control-md);
+    display:grid;place-items:center;cursor:pointer;
+    background:var(--rare-color-background-default);
+    border:var(--rare-border-width-default) solid var(--rare-color-border-strong);
+    border-radius:var(--rare-radius-pill);
+    color:var(--rare-color-text-default);
+    transition:background var(--rare-motion-duration-fast) var(--rare-motion-easing-standard);
+  }
+  .doc-preview-close:hover{background:var(--rare-color-background-muted)}
+  .doc-preview-close svg{width:20px;height:20px}
+  /* Scrolling document body */
+  .doc-preview-body{
+    flex:1 1 auto;overflow-y:auto;-webkit-overflow-scrolling:touch;
+    padding:var(--rare-space-8) clamp(var(--rare-space-5), 4vw, var(--rare-space-9));
+  }
+  .doc{max-width:62ch;margin-inline:auto;line-height:var(--rare-line-height-relaxed)}
+  .doc > * + *{margin-top:var(--rare-space-4)}
+  .doc-kicker{
+    font-family:var(--rare-font-family-display);font-weight:var(--rare-font-weight-bold);
+    text-transform:uppercase;letter-spacing:.06em;
+    font-size:var(--rare-font-size-200);color:var(--rare-color-text-muted);
+  }
+  .doc-title{
+    font-family:var(--rare-font-family-display);font-weight:var(--rare-font-weight-extrabold);
+    font-size:clamp(var(--rare-font-size-600), 2.4vw, var(--rare-font-size-700));
+    line-height:var(--rare-line-height-tight);color:var(--rare-color-text-default);
+  }
+  .doc-subhead{color:var(--rare-color-text-muted)}
+  .doc-h{
+    font-family:var(--rare-font-family-display);font-weight:var(--rare-font-weight-bold);
+    font-size:var(--rare-font-size-500);margin-top:var(--rare-space-6);
+  }
+  .doc-contact a{color:var(--rare-color-action-primary)}
 
   @media (prefers-reduced-motion:reduce){
     *{scroll-behavior:auto !important;transition:none !important}
@@ -555,7 +633,9 @@
                 <div class="chat-msg chat-msg--user">
                   <p>Here's a draft of our <strong>press release</strong> about our new
                   battery program. <strong>Review it</strong>. Where could it be improved?</p>
-                  <p class="chat-file"><span class="chat-file-ico" aria-hidden="true">📄</span>press-release-draft.docx</p>
+                  <button type="button" class="chat-file" id="file-chip"
+                          aria-haspopup="dialog" aria-controls="doc-preview"
+                          aria-label="Open preview of press-release-draft.docx"><span class="chat-file-ico" aria-hidden="true">📄</span>press-release-draft.docx</button>
                 </div>
                 <div class="chat-msg chat-msg--agent">
                   <p class="chat-meta">All 8 passes complete. Now synthesis and fidelity audit.</p>
@@ -730,7 +810,7 @@
       <div class="cases-head">
         <p class="eyebrow eyebrow--feature">Use Cases</p>
         <h2 class="section-heading" id="cases-heading">
-          Speak Sustainability levels up your comms at many points in your process.
+          Speak Sustainability levels up your communications at key points in your process.
         </h2>
       </div>
 
@@ -826,6 +906,35 @@
     </div>
   </div>
 </footer>
+
+<!-- ============================ FILE PREVIEW MODAL ============================ -->
+<dialog class="doc-preview" id="doc-preview" aria-labelledby="doc-preview-title">
+  <div class="doc-preview-bar">
+    <span class="doc-preview-name" id="doc-preview-title"><span aria-hidden="true">📄</span> press-release-draft.docx</span>
+    <button type="button" class="doc-preview-close" data-close aria-label="Close preview">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="doc-preview-body">
+    <article class="doc">
+      <p class="doc-kicker">For immediate release</p>
+      <h1 class="doc-title">PowerLoop Technologies Expands Swappable Battery Program to Five New Cities Following Successful Pilot</h1>
+      <p class="doc-subhead"><em>Delivery scooter program cuts emissions, reduces downtime, and wins over drivers in initial rollout</em></p>
+      <p><strong>AUSTIN, Texas — August 3, 2026</strong> — PowerLoop Technologies, a leading logistics technology company powering last-mile delivery fleets across North America, today announced the expansion of its swappable battery pilot program to five additional cities, following a highly successful initial launch.</p>
+      <p>The program equips delivery drivers with electric scooters powered by swappable batteries, which can be exchanged in seconds at PowerLoop-operated swap stations throughout each city. Instead of waiting for a scooter to recharge, drivers simply swap a depleted battery for a fully charged one and get back on the road — minimizing downtime and maximizing delivery efficiency.</p>
+      <p>"We're thrilled with the results of our pilot program," said Jordan Ellis, Chief Executive Officer of PowerLoop Technologies. "This is a game-changing step forward for the delivery industry, and we're proud to be leading the charge toward a smarter, more sustainable future."</p>
+      <p>During the pilot, PowerLoop saw significantly lower emissions compared to traditional gas-powered delivery vehicles, along with a notable drop in maintenance issues and breakdowns. Scooters also ran quieter than earlier models, an added benefit for the urban neighborhoods where deliveries take place. In driver surveys conducted at the end of the pilot, the overwhelming majority of participating drivers said they would prefer to continue using the battery-swap system going forward.</p>
+      <p>"Our drivers are the backbone of this business, and their feedback shapes everything we do," said Maria Chen, Chief Operating Officer of PowerLoop Technologies. "The response we've gotten has been overwhelmingly positive, and it's clear this program is the right direction for our fleet."</p>
+      <p>Following the pilot's success, PowerLoop will expand the swappable battery program to five new cities in the coming months, with additional swap stations planned to support growing demand. The company says the expansion is part of its broader mission to modernize urban delivery logistics.</p>
+      <p>"This program is good for our drivers, good for our customers, and good for the planet," Ellis added. "We're excited to keep scaling this innovation and to explore even more ways to bring cutting-edge technology to the logistics industry."</p>
+      <p>PowerLoop plans to share additional details on the expansion, including new city locations and station rollout timelines, in the coming weeks.</p>
+      <h2 class="doc-h">About PowerLoop Technologies</h2>
+      <p>PowerLoop Technologies is a logistics technology company building smarter infrastructure for last-mile delivery. Through its network of scooter fleets and battery swap stations, PowerLoop partners with delivery companies to make urban logistics faster, cleaner, and more reliable. PowerLoop is headquartered in Austin, Texas.</p>
+      <h2 class="doc-h">Media Contact</h2>
+      <p class="doc-contact">Sarah Kim<br>Director of Communications, PowerLoop Technologies<br><a href="mailto:press@powerlooptech.com">press@powerlooptech.com</a><br>(512) 555-0142</p>
+    </article>
+  </div>
+</dialog>
 
 <script>
 (function(){
@@ -972,6 +1081,54 @@
       status.classList.remove("form-status--error");
       status.textContent = "Thanks — you're on the list. We'll be in touch.";
       form.reset();
+    });
+  })();
+
+  /* ---------------------------------------------------------
+     FILE PREVIEW — the chat card's file chip opens a modal
+     <dialog> showing the draft. Native dialog gives ESC-to-close,
+     focus handling, and a backdrop; we add backdrop-click-to-close,
+     an explicit close button, and background scroll lock.
+     --------------------------------------------------------- */
+  (function docPreview(){
+    var trigger = document.getElementById("file-chip");
+    var dlg     = document.getElementById("doc-preview");
+    if(!trigger || !dlg) return;
+    // Graceful no-op if <dialog> is unsupported (very old browsers).
+    if(typeof dlg.showModal !== "function") return;
+    var closeBtn = dlg.querySelector("[data-close]");
+    var body     = dlg.querySelector(".doc-preview-body");
+
+    function open(){
+      dlg.showModal();
+      document.body.classList.add("modal-open");
+      if(body) body.scrollTop = 0;       // always start at the top of the document
+    }
+    // Cleanup is imperative (not tied to the dialog 'close' event, which some
+    // engines don't fire): release the scroll lock and restore focus to the chip.
+    function close(){
+      if(dlg.open) dlg.close();
+      document.body.classList.remove("modal-open");
+      trigger.focus();
+    }
+
+    trigger.addEventListener("click", open);
+    if(closeBtn) closeBtn.addEventListener("click", close);
+
+    // Click outside the window box (on the backdrop) closes it.
+    dlg.addEventListener("click", function(e){
+      var r = dlg.getBoundingClientRect();
+      var inside = e.clientX >= r.left && e.clientX <= r.right &&
+                   e.clientY >= r.top  && e.clientY <= r.bottom;
+      if(!inside) close();
+    });
+
+    // ESC handling. A modal dialog dispatches 'cancel', but not every engine
+    // fires it reliably — so also close on a direct Escape keydown. preventDefault
+    // stops any native close so our cleanup (scroll lock + focus) always runs.
+    dlg.addEventListener("cancel", function(e){ e.preventDefault(); close(); });
+    dlg.addEventListener("keydown", function(e){
+      if(e.key === "Escape" || e.key === "Esc"){ e.preventDefault(); close(); }
     });
   })();
 })();
