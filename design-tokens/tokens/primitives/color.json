@@ -34,7 +34,7 @@
       "700": { "$value": "#4A6B00", "$type": "color", "$description": "Secondary accent lime shade — AA-safe reveal ink on lime.100 (5.6:1)." }
     },
     "yellow": {
-      "100": { "$value": "#F3DE9A", "$type": "color", "$description": "Rare Yellow tint — Speak Sustainability featured/active use-case card surface. Deliberately richer than the other accents' .100 tints: gold at whisper strength reads as off-white, so the 'gold card' treatment needs a fuller tint to register. Added for Speak Sustainability; the mockup's gold accent has no equivalent in Change Agent's live palette." },
+      "100": { "$value": "#FADF9F", "$type": "color", "$description": "Rare Yellow pale tint — Comms Critique card rollover fill. Deliberately fuller than the other accents' .100 tints (lime/orange sit near-white): gold at whisper strength reads as off-white, so it needs a bit more saturation to register. Added for Speak Sustainability; no equivalent in Change Agent's live palette." },
       "500": { "$value": "#EEAF00", "$type": "color", "$description": "Rare Yellow — brand-guide SECONDARY. Also the decorative plus-mark graphic on the featured card." },
       "700": { "$value": "#6E5200", "$type": "color", "$description": "Secondary accent yellow shade — AA-safe gold ink. 5.5:1 on yellow.100 (featured card copy) and 6.6:1 on background-subtle (the Use Cases eyebrow). Matches the .700 AA-safe-ink convention of the cyan/orange/lime accents." }
     },

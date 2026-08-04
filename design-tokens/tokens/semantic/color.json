@@ -13,7 +13,6 @@
     },
     "surface": {
       "brand":        { "$value": "{color.green.500}", "$type": "color", "$description": "Hero brand panel — Rare Green (brand-guide PRIMARY). Speak Sustainability leads with green where Change Agent leads with Rare Blue; green.500 keeps white hero text at AA (4.7:1) where the mockup's lighter lime would fail." },
-      "feature":      { "$value": "{color.yellow.100}", "$type": "color", "$description": "Featured/active use-case card surface — the gold 'Comms Critique' card that stands apart from the plain outlined cards." },
       "chat-user":    { "$value": "{color.blue.50}",   "$type": "color", "$description": "User chat bubble." },
       "chat-agent":   { "$value": "{color.white}",     "$type": "color", "$description": "Agent chat surface (white + border to stay distinct from canvas)." }
     },

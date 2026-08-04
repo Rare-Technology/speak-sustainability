@@ -403,47 +403,60 @@
      auto-fit + minmax gives the reflow with no new breakpoint and no
      swipeable track. One card carries the gold "featured" treatment.
      ============================================================ */
-  .cases{background:var(--rare-color-background-subtle);padding-block:var(--rare-space-11)}
+  .cases{
+    background:var(--rare-color-background-subtle);padding-block:var(--rare-space-11);
+    /* Rollover fills — a pale Rare accent tint per card. Product-scope bindings
+       straight to primitives, mirroring Change Agent's --ca-* card fills. */
+    --ss-card-fill-1:var(--rare-color-yellow-100);   /* Comms Critique — pale gold   (#fadf9f) */
+    --ss-card-fill-2:var(--rare-color-lime-100);     /* Land a Point — pale lime     (#eff7e0) */
+    --ss-card-fill-3:var(--rare-color-orange-100);   /* Frame Exploration — pale orange (#fef0e7) */
+  }
   .cases-head{margin-bottom:var(--rare-space-7)}
   .cases-head .section-heading{max-width:720px}   /* ~2/3 of the content width; fills the column when narrower */
   .cases-grid{
     display:grid;
     grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));
     gap:var(--rare-space-5);
-    align-items:stretch;             /* all cards equal height */
+    align-items:start;               /* let each card's aspect-ratio set its height */
   }
   .case-card{
     position:relative;
-    min-height:240px;                /* room for the featured card's plus graphic — layout constant */
+    /* Fixed portrait aspect-ratio (à la Change Agent's 3/4 case cards): the height
+       scales with the width so the card always stays tall enough for the bottom-left
+       rollover illustration to clear the top text. Grows past this if text needs it. */
+    aspect-ratio:8 / 9;
     background:var(--rare-color-background-default);
     border:var(--rare-border-width-default) solid var(--rare-color-border-default);
     border-radius:var(--rare-radius-card);
     padding:var(--rare-space-5);
     display:flex;flex-direction:column;
-    overflow:hidden;                 /* clip the featured plus-mark to the rounded corner */
+    overflow:hidden;                 /* clip the flush bottom-left illustration to the rounded corner */
+    transition:background var(--rare-motion-duration-fast) var(--rare-motion-easing-standard);
   }
-  /* Featured / active card — gold surface, no outline, gold supporting copy. */
-  .case-card--feature{
-    background:var(--rare-color-surface-feature);
-    border-color:transparent;
-  }
-  .case-card--feature .case-desc{color:var(--rare-color-text-feature)}
+  /* Rollover: each card fills with its own pale accent tint. */
+  .case-card:nth-child(1):hover{background:var(--ss-card-fill-1)}
+  .case-card:nth-child(2):hover{background:var(--ss-card-fill-2)}
+  .case-card:nth-child(3):hover{background:var(--ss-card-fill-3)}
   .case-title{
     font-family:var(--rare-font-family-display);font-weight:var(--rare-font-weight-bold);
     font-size:var(--rare-font-size-500);
     margin-bottom:var(--rare-space-2);
   }
   .case-desc{color:var(--rare-color-text-muted);font-size:var(--rare-font-size-300);max-width:26ch}
-  /* Decorative plus-mark cluster, flush to the featured card's bottom-left corner,
-     behind the text. Purely ornamental (aria-hidden). */
-  .case-plus{
-    position:absolute;left:var(--rare-space-4);bottom:var(--rare-space-4);
-    width:38%;max-width:120px;height:auto;
-    color:var(--rare-color-yellow-500);
-    opacity:.5;
+  /* Rollover illustration: fades in flush to the card's bottom-left corner. Absolute
+     offsets resolve against the padding box, so left/bottom:0 lands on the card corner,
+     ignoring the card padding (zero padding, as requested). The image's own transparent
+     bottom + left padding is intentional and supplies the spacing. Decorative
+     (aria-hidden); sits behind the text. */
+  .case-media{
+    position:absolute;left:0;bottom:0;
+    width:42%;max-width:184px;height:auto;
+    opacity:0;
     z-index:var(--rare-elevation-z-base);
     pointer-events:none;
+    transition:opacity var(--rare-motion-duration-fast) var(--rare-motion-easing-standard);
   }
+  .case-card:hover .case-media{opacity:1}
   .case-card > :where(.case-title, .case-desc){position:relative;z-index:var(--rare-elevation-z-raised)}
 
   /* ============================================================
@@ -815,22 +828,23 @@
       </div>
 
       <ul class="cases-grid" role="list">
-        <li class="case-card case-card--feature">
+        <li class="case-card">
           <h3 class="case-title">Comms Critique</h3>
           <p class="case-desc">Improve your comms so your points have the impact you seek.</p>
-          <svg class="case-plus" viewBox="0 0 100 100" fill="currentColor" aria-hidden="true">
-            <path d="M34 4h10v20h20v10H44v20H34V34H14V24h20z"/>
-            <path d="M68 44h7v14h14v7H75v14h-7V65H54v-7h14z"/>
-            <path d="M20 58h5v10h10v5H25v10h-5V73H10v-5h10z"/>
-          </svg>
+          <img class="case-media" src="assets/case-comms-critique.webp" alt="" aria-hidden="true"
+               width="716" height="599" loading="lazy" decoding="async" />
         </li>
         <li class="case-card">
           <h3 class="case-title">Land a Point</h3>
           <p class="case-desc">Focus on a specific point you need to land with an audience.</p>
+          <img class="case-media" src="assets/case-land-a-point.webp" alt="" aria-hidden="true"
+               width="743" height="684" loading="lazy" decoding="async" />
         </li>
         <li class="case-card">
           <h3 class="case-title">Frame Exploration</h3>
           <p class="case-desc">As you get started, find the breakthrough frames that match your comm goals.</p>
+          <img class="case-media" src="assets/case-frame-exploration.webp" alt="" aria-hidden="true"
+               width="766" height="768" loading="lazy" decoding="async" />
         </li>
       </ul>
     </div>

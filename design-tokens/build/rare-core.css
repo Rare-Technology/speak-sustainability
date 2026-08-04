@@ -22,7 +22,7 @@
   --rare-color-lime-100: #eff7e0; /** Secondary accent lime tint — soft decorative surface. */
   --rare-color-lime-500: #7ab800; /** Rare Lime — brand-guide SECONDARY. Brand-guide palette value, retained in Core for cross-consumer use; may be unused on any given surface. */
   --rare-color-lime-700: #4a6b00; /** Secondary accent lime shade — AA-safe reveal ink on lime.100 (5.6:1). */
-  --rare-color-yellow-100: #f3de9a; /** Rare Yellow tint — Speak Sustainability featured/active use-case card surface. Deliberately richer than the other accents' .100 tints: gold at whisper strength reads as off-white, so the 'gold card' treatment needs a fuller tint to register. Added for Speak Sustainability; the mockup's gold accent has no equivalent in Change Agent's live palette. */
+  --rare-color-yellow-100: #fadf9f; /** Rare Yellow pale tint — Comms Critique card rollover fill. Deliberately fuller than the other accents' .100 tints (lime/orange sit near-white): gold at whisper strength reads as off-white, so it needs a bit more saturation to register. Added for Speak Sustainability; no equivalent in Change Agent's live palette. */
   --rare-color-yellow-500: #eeaf00; /** Rare Yellow — brand-guide SECONDARY. Also the decorative plus-mark graphic on the featured card. */
   --rare-color-yellow-700: #6e5200; /** Secondary accent yellow shade — AA-safe gold ink. 5.5:1 on yellow.100 (featured card copy) and 6.6:1 on background-subtle (the Use Cases eyebrow). Matches the .700 AA-safe-ink convention of the cyan/orange/lime accents. */
   --rare-color-white: #ffffff; /** Pure white — raised surfaces, on-brand text. */
@@ -86,7 +86,6 @@
   --rare-color-background-subtle: var(--rare-color-gray-50); /** Base page canvas (mid tier). */
   --rare-color-background-muted: var(--rare-color-gray-100); /** Alternating section bands & neutral control fills (base tier). */
   --rare-color-surface-brand: var(--rare-color-green-500); /** Hero brand panel — Rare Green (brand-guide PRIMARY). Speak Sustainability leads with green where Change Agent leads with Rare Blue; green.500 keeps white hero text at AA (4.7:1) where the mockup's lighter lime would fail. */
-  --rare-color-surface-feature: var(--rare-color-yellow-100); /** Featured/active use-case card surface — the gold 'Comms Critique' card that stands apart from the plain outlined cards. */
   --rare-color-surface-chat-user: var(--rare-color-blue-50); /** User chat bubble. */
   --rare-color-surface-chat-agent: var(--rare-color-white); /** Agent chat surface (white + border to stay distinct from canvas). */
   --rare-color-action-primary: var(--rare-color-blue-500); /** Primary buttons / links. */
