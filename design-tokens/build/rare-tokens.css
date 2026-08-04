@@ -1,0 +1,106 @@
+/**
+ * Do not edit directly, this file was auto-generated.
+ */
+
+:root {
+  --rare-color-blue-50: #e6f1fb; /** Rare Blue tint — chat-user surface, subtle blue fills. */
+  --rare-color-blue-500: #005bbb; /** Rare Blue — primary brand action color & hero brand surface. */
+  --rare-color-blue-600: #00499a; /** Rare Blue shade — primary action hover/active. */
+  --rare-color-green-500: #008542; /** Rare Green — brand-guide PRIMARY. Brand-guide palette value, retained in Core for cross-consumer use; may be unused on any given surface. */
+  --rare-color-gray-50: #f4f6f8; /** Neutral 50 — base page canvas. */
+  --rare-color-gray-100: #e9edf1; /** Neutral 100 — alternating section band / muted control fill. */
+  --rare-color-gray-200: #dde3e8; /** Neutral 200 — default borders / hairlines. */
+  --rare-color-gray-700: #5e6a71; /** Rare Gray — muted text and strong borders. */
+  --rare-color-red-100: #f7e8ed; /** Secondary accent red tint — soft decorative surface. */
+  --rare-color-red-500: #aa1948; /** Secondary accent — error/feedback; AA-safe reveal ink on its own tint. */
+  --rare-color-cyan-100: #e0f5fa; /** Secondary accent cyan tint — soft decorative surface. */
+  --rare-color-cyan-500: #00afd8; /** Rare Cyan — brand-guide SECONDARY. Brand-guide palette value, retained in Core for cross-consumer use; may be unused on any given surface. */
+  --rare-color-cyan-700: #08627a; /** Secondary accent cyan shade — AA-safe reveal ink on cyan.100 (6.1:1). */
+  --rare-color-orange-100: #fef0e7; /** Secondary accent orange tint — soft decorative surface. */
+  --rare-color-orange-500: #f58233; /** Rare Orange — brand-guide SECONDARY. Brand-guide palette value, retained in Core for cross-consumer use; may be unused on any given surface. */
+  --rare-color-orange-700: #a34d17; /** Secondary accent orange shade — AA-safe reveal ink on orange.100 (5.2:1). */
+  --rare-color-lime-100: #eff7e0; /** Secondary accent lime tint — soft decorative surface. */
+  --rare-color-lime-500: #7ab800; /** Rare Lime — brand-guide SECONDARY. Brand-guide palette value, retained in Core for cross-consumer use; may be unused on any given surface. */
+  --rare-color-lime-700: #4a6b00; /** Secondary accent lime shade — AA-safe reveal ink on lime.100 (5.6:1). */
+  --rare-color-yellow-100: #f3de9a; /** Rare Yellow tint — Speak Sustainability featured/active use-case card surface. Deliberately richer than the other accents' .100 tints: gold at whisper strength reads as off-white, so the 'gold card' treatment needs a fuller tint to register. Added for Speak Sustainability; the mockup's gold accent has no equivalent in Change Agent's live palette. */
+  --rare-color-yellow-500: #eeaf00; /** Rare Yellow — brand-guide SECONDARY. Also the decorative plus-mark graphic on the featured card. */
+  --rare-color-yellow-700: #6e5200; /** Secondary accent yellow shade — AA-safe gold ink. 5.5:1 on yellow.100 (featured card copy) and 6.6:1 on background-subtle (the Use Cases eyebrow). Matches the .700 AA-safe-ink convention of the cyan/orange/lime accents. */
+  --rare-color-white: #ffffff; /** Pure white — raised surfaces, on-brand text. */
+  --rare-color-ink: #1a1d1f; /** Near-black ink — default body text. */
+  --rare-elevation-z-base: 0; /** Ground plane — decorative fills and background media that must sit behind their own container's content. */
+  --rare-elevation-z-raised: 1; /** Lifted above sibling background media within the same component — e.g. card text over a card illustration. */
+  --rare-elevation-z-sticky: 2; /** Pinned affordance inside a scrolling container — scroll hints, in-card overlays. Above component content, below any page-level overlay. */
+  --rare-elevation-z-overlay: 20; /** Full-surface overlay that covers page content — the mobile navigation panel, drawers, scrims. */
+  --rare-elevation-z-modal: 30; /** Sits above an overlay — dialog chrome and the controls that must stay reachable while an overlay is open (e.g. the close button and logo over the mobile menu). */
+  --rare-motion-duration-fast: 150ms; /** Hover/color transitions. */
+  --rare-motion-duration-base: 200ms; /** Accordion / transform transitions. */
+  --rare-motion-easing-standard: cubic-bezier(0.2, 0, 0, 1); /** Standard ease. */
+  --rare-radius-sm: 4px; /** Focus ring / small controls. */
+  --rare-radius-md: 8px; /** Buttons, inputs. */
+  --rare-radius-lg: 12px; /** Accordion items, chat bubbles. */
+  --rare-radius-card: 14px; /** Cards / chat panel — preserves v2's 14px. */
+  --rare-radius-xl: 24px; /** Large hero panel. Normalized 22px→24px to sit on the 4px grid; the 2px delta is imperceptible at hero scale. */
+  --rare-radius-pill: 9999px; /** Circular / pill controls. */
+  --rare-size-container: 1220px; /** Max content width — app/marketing surfaces. */
+  --rare-size-container-narrow: 820px; /** Max width for long-form reading columns (legal/policy pages). */
+  --rare-size-control-sm: 28px; /** Small square/circular control box — step badges, compact icon targets. A control DIMENSION, not spacing: it sizes a box rather than the gap around one, so it lives on the size scale rather than the 4px space ramp. */
+  --rare-size-control-md: 40px; /** Medium square control box — icon buttons, carousel arrows. Meets the 40px minimum comfortable pointer target. */
+  --rare-border-width-default: 1px; /** Hairline borders. */
+  --rare-border-width-strong: 1.5px; /** Input borders. INTENTIONALLY off the 4px grid: the 4px grid governs SPACING (gaps, insets, rhythm), not stroke weights. Hairline-class strokes are their own concern and legitimately land on sub-grid values — 1.5px is the deliberate mid-step between the 1px hairline and a 2px heavy rule. Not a defect; do not 'normalize' this to 1px or 2px. */
+  --rare-border-width-focus: 3px; /** Focus-visible outline. */
+  --rare-border-offset-focus: 2px; /** Gap between a focus ring and the element it outlines. Pairs with border.width.focus so focus treatment is fully tokenized and stays consistent across every consumer (a11y-critical: focus affordances must not drift per-surface). */
+  --rare-space-0: 0; /** SCALE ANCHOR: the zero step of the 4px space ramp. Retained so the scale starts at an explicit, nameable origin and consumers can reset spacing via a token rather than a literal 0. Not dead. */
+  --rare-space-1: 4px;
+  --rare-space-2: 8px;
+  --rare-space-3: 12px;
+  --rare-space-4: 16px;
+  --rare-space-5: 20px;
+  --rare-space-6: 24px; /** Section gutter. */
+  --rare-space-7: 32px;
+  --rare-space-8: 40px;
+  --rare-space-9: 48px;
+  --rare-space-10: 64px;
+  --rare-space-11: 72px;
+  --rare-font-family-source-sans: "Source Sans 3", Arial, system-ui, sans-serif; /** Text/UI primitive stack. Prepend licensed "Univers Next" here to swap; nothing downstream names a font. */
+  --rare-font-family-barlow: "Barlow Semi Condensed", "Arial Narrow", Arial, sans-serif; /** Condensed display primitive stack. Prepend licensed "PF Square Sans" here to swap. */
+  --rare-font-size-200: 0.875rem; /** 14px */
+  --rare-font-size-300: 1rem; /** 16px */
+  --rare-font-size-400: 1.125rem; /** 18px — body copy */
+  --rare-font-size-500: 1.25rem; /** 20px */
+  --rare-font-size-600: 1.5rem; /** 24px */
+  --rare-font-size-700: 1.875rem; /** 30px */
+  --rare-font-size-900: 3rem; /** 48px — display. SCALE ANCHOR: retained as a step on the ordinal type ramp even while unbound. Ordinal scales must stay contiguous — removing an interior step would force a renumber and break every downstream consumer. Not dead. */
+  --rare-font-size-1000: 4rem; /** 64px — hero display */
+  --rare-font-weight-regular: 400; /** SCALE ANCHOR: the baseline weight the ramp is measured from. Rendered as the inherited body default rather than bound explicitly, so it reads as unreferenced — retained deliberately. Not dead. */
+  --rare-font-weight-semibold: 600;
+  --rare-font-weight-bold: 700;
+  --rare-font-weight-extrabold: 800; /** Display-heavy — Barlow hero headline. */
+  --rare-line-height-tight: 1.1; /** Display headlines. */
+  --rare-line-height-normal: 1.5; /** UI / dense text. */
+  --rare-line-height-relaxed: 1.65; /** Long-form body copy. */
+  --rare-case-card-width: clamp(240px, 26vw, 320px); /** PRODUCT-SCOPE — NOT PUBLISHED to the shared rare-tokens package. Fixed width of one use-case card in the horizontal scroller: 320px above the medium breakpoint (~1024px), scaling down to a 240px floor on the narrowest phones. The 26vw term is calibrated against THIS page's full-bleed scroller and resolves against the viewport, not the parent — inside any narrower container it computes a wrong width. Width is the only driver — height follows from case-card.aspect-ratio — so every card is identical in size and the ratio holds at every breakpoint. */
+  --rare-case-card-aspect-ratio: 3 / 4; /** PRODUCT-SCOPE — NOT PUBLISHED to the shared rare-tokens package. Portrait aspect ratio (width:height = 3:4) applied to every use-case card. Held constant across all breakpoints so cards only shrink, never re-proportion. Carries no viewport math itself, but is meaningless without case-card.width, so it ships with it. */
+  --rare-chat-preview-width: clamp(420px, 52.8vw, 540px); /** PRODUCT-SCOPE — NOT PUBLISHED to the shared rare-tokens package. Fluid width of the hero chat-preview card (and its two-column grid track): 540px max above the medium breakpoint (~1024px), scaling down to a 420px floor through the medium band; capped to 100% on the narrowest phones. The 52.8vw term is calibrated against THIS page's full-width hero panel and resolves against the viewport, not the parent — inside any narrower container (sidebar, modal, split pane) it computes a wrong width. Kept in lockstep with chat-preview.font (30x ratio) so the card zooms as one unit. */
+  --rare-color-text-default: var(--rare-color-ink); /** Body text. */
+  --rare-color-text-muted: var(--rare-color-gray-700); /** Secondary / supporting text. */
+  --rare-color-text-on-brand: var(--rare-color-white); /** Text on brand/action surfaces. */
+  --rare-color-text-feature: var(--rare-color-yellow-700); /** Gold ink for the featured/active treatment — the Use Cases eyebrow and the featured card's supporting copy. AA-safe on both background-subtle and surface.feature. */
+  --rare-color-background-default: var(--rare-color-white); /** Raised cards & surfaces (top tier). */
+  --rare-color-background-subtle: var(--rare-color-gray-50); /** Base page canvas (mid tier). */
+  --rare-color-background-muted: var(--rare-color-gray-100); /** Alternating section bands & neutral control fills (base tier). */
+  --rare-color-surface-brand: var(--rare-color-green-500); /** Hero brand panel — Rare Green (brand-guide PRIMARY). Speak Sustainability leads with green where Change Agent leads with Rare Blue; green.500 keeps white hero text at AA (4.7:1) where the mockup's lighter lime would fail. */
+  --rare-color-surface-feature: var(--rare-color-yellow-100); /** Featured/active use-case card surface — the gold 'Comms Critique' card that stands apart from the plain outlined cards. */
+  --rare-color-surface-chat-user: var(--rare-color-blue-50); /** User chat bubble. */
+  --rare-color-surface-chat-agent: var(--rare-color-white); /** Agent chat surface (white + border to stay distinct from canvas). */
+  --rare-color-action-primary: var(--rare-color-blue-500); /** Primary buttons / links. */
+  --rare-color-action-primary-hover: var(--rare-color-blue-600); /** Primary hover/active. */
+  --rare-color-border-default: var(--rare-color-gray-200); /** Default hairline borders. */
+  --rare-color-border-strong: var(--rare-color-gray-700); /** Emphasized borders / input rules. */
+  --rare-color-feedback-error: var(--rare-color-red-500); /** Form validation errors. */
+  --rare-color-focus-ring: var(--rare-color-blue-500); /** Focus-visible outline color. */
+  --rare-font-family-text: var(--rare-font-family-source-sans); /** Default text/UI face — body, forms, labels. */
+  --rare-font-family-display: var(--rare-font-family-barlow); /** Condensed display face — headlines & callouts only. */
+  --rare-font-size-hero: var(--rare-font-size-1000); /** Hero display headline role — the size a hero headline renders at when unconstrained (64px). A ROLE ONLY: it carries no viewport or layout behaviour, so any consumer can bind it in any context. A surface that wants a fluid hero composes the clamp itself against its own known container (see .hero-headline in index.html); that layout rule must not be baked back into this token. */
+  --rare-font-size-hero-min: var(--rare-font-size-700); /** Lower bound for a fluid hero headline (30px) — the floor a surface clamps to on narrow viewports. Paired with font.size.hero as the cap; the interpolation between them belongs to the surface, not to Core. */
+  --rare-chat-preview-font: clamp(var(--rare-font-size-200), 1.76vw, var(--rare-font-size-400)); /** PRODUCT-SCOPE — NOT PUBLISHED to the shared rare-tokens package. Master font size for the chat card: 18px above the medium breakpoint (~1024px), scaling to a 14px floor through the medium band. The card text inherits this, so text and width shrink together for a cohesive resize. The 1.76vw term is viewport-relative and page-calibrated; it is only correct in this page's hero context. */
+}

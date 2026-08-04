@@ -1,0 +1,11 @@
+{
+  "elevation": {
+    "z": {
+      "base":    { "$value": "0",  "$type": "number", "$description": "Ground plane — decorative fills and background media that must sit behind their own container's content." },
+      "raised":  { "$value": "1",  "$type": "number", "$description": "Lifted above sibling background media within the same component — e.g. card text over a card illustration." },
+      "sticky":  { "$value": "2",  "$type": "number", "$description": "Pinned affordance inside a scrolling container — scroll hints, in-card overlays. Above component content, below any page-level overlay." },
+      "overlay": { "$value": "20", "$type": "number", "$description": "Full-surface overlay that covers page content — the mobile navigation panel, drawers, scrims." },
+      "modal":   { "$value": "30", "$type": "number", "$description": "Sits above an overlay — dialog chrome and the controls that must stay reachable while an overlay is open (e.g. the close button and logo over the mobile menu)." }
+    }
+  }
+}

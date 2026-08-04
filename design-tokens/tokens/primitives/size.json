@@ -1,0 +1,18 @@
+{
+  "size": {
+    "container": { "$value": "1220px", "$type": "dimension", "$description": "Max content width — app/marketing surfaces." },
+    "container-narrow": { "$value": "820px", "$type": "dimension", "$description": "Max width for long-form reading columns (legal/policy pages)." },
+    "control-sm": { "$value": "28px", "$type": "dimension", "$description": "Small square/circular control box — step badges, compact icon targets. A control DIMENSION, not spacing: it sizes a box rather than the gap around one, so it lives on the size scale rather than the 4px space ramp." },
+    "control-md": { "$value": "40px", "$type": "dimension", "$description": "Medium square control box — icon buttons, carousel arrows. Meets the 40px minimum comfortable pointer target." }
+  },
+  "border": {
+    "width": {
+      "default": { "$value": "1px",   "$type": "dimension", "$description": "Hairline borders." },
+      "strong":  { "$value": "1.5px", "$type": "dimension", "$description": "Input borders. INTENTIONALLY off the 4px grid: the 4px grid governs SPACING (gaps, insets, rhythm), not stroke weights. Hairline-class strokes are their own concern and legitimately land on sub-grid values — 1.5px is the deliberate mid-step between the 1px hairline and a 2px heavy rule. Not a defect; do not 'normalize' this to 1px or 2px." },
+      "focus":   { "$value": "3px",   "$type": "dimension", "$description": "Focus-visible outline." }
+    },
+    "offset": {
+      "focus": { "$value": "2px", "$type": "dimension", "$description": "Gap between a focus ring and the element it outlines. Pairs with border.width.focus so focus treatment is fully tokenized and stays consistent across every consumer (a11y-critical: focus affordances must not drift per-surface)." }
+    }
+  }
+}

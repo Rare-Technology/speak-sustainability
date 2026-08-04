@@ -1,0 +1,12 @@
+{
+  "font": {
+    "family": {
+      "text":    { "$value": "{font.family.source-sans}", "$type": "fontFamily", "$description": "Default text/UI face — body, forms, labels." },
+      "display": { "$value": "{font.family.barlow}",      "$type": "fontFamily", "$description": "Condensed display face — headlines & callouts only." }
+    },
+    "size": {
+      "hero": { "$value": "{font.size.1000}", "$type": "dimension", "$description": "Hero display headline role — the size a hero headline renders at when unconstrained (64px). A ROLE ONLY: it carries no viewport or layout behaviour, so any consumer can bind it in any context. A surface that wants a fluid hero composes the clamp itself against its own known container (see .hero-headline in index.html); that layout rule must not be baked back into this token." },
+      "hero-min": { "$value": "{font.size.700}", "$type": "dimension", "$description": "Lower bound for a fluid hero headline (30px) — the floor a surface clamps to on narrow viewports. Paired with font.size.hero as the cap; the interpolation between them belongs to the surface, not to Core." }
+    }
+  }
+}

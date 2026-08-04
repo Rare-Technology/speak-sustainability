@@ -1,0 +1,37 @@
+{
+  "font": {
+    "family": {
+      "source-sans": {
+        "$value": "\"Source Sans 3\", Arial, system-ui, sans-serif",
+        "$type": "fontFamily",
+        "$description": "Text/UI primitive stack. Prepend licensed \"Univers Next\" here to swap; nothing downstream names a font."
+      },
+      "barlow": {
+        "$value": "\"Barlow Semi Condensed\", \"Arial Narrow\", Arial, sans-serif",
+        "$type": "fontFamily",
+        "$description": "Condensed display primitive stack. Prepend licensed \"PF Square Sans\" here to swap."
+      }
+    },
+    "size": {
+      "200":  { "$value": "0.875rem", "$type": "dimension", "$description": "14px" },
+      "300":  { "$value": "1rem",     "$type": "dimension", "$description": "16px" },
+      "400":  { "$value": "1.125rem", "$type": "dimension", "$description": "18px — body copy" },
+      "500":  { "$value": "1.25rem",  "$type": "dimension", "$description": "20px" },
+      "600":  { "$value": "1.5rem",   "$type": "dimension", "$description": "24px" },
+      "700":  { "$value": "1.875rem", "$type": "dimension", "$description": "30px" },
+      "900":  { "$value": "3rem",     "$type": "dimension", "$description": "48px — display. SCALE ANCHOR: retained as a step on the ordinal type ramp even while unbound. Ordinal scales must stay contiguous — removing an interior step would force a renumber and break every downstream consumer. Not dead." },
+      "1000": { "$value": "4rem",     "$type": "dimension", "$description": "64px — hero display" }
+    },
+    "weight": {
+      "regular":   { "$value": "400", "$type": "fontWeight", "$description": "SCALE ANCHOR: the baseline weight the ramp is measured from. Rendered as the inherited body default rather than bound explicitly, so it reads as unreferenced — retained deliberately. Not dead." },
+      "semibold":  { "$value": "600", "$type": "fontWeight" },
+      "bold":      { "$value": "700", "$type": "fontWeight" },
+      "extrabold": { "$value": "800", "$type": "fontWeight", "$description": "Display-heavy — Barlow hero headline." }
+    }
+  },
+  "line-height": {
+    "tight":   { "$value": "1.1",  "$type": "number", "$description": "Display headlines." },
+    "normal":  { "$value": "1.5",  "$type": "number", "$description": "UI / dense text." },
+    "relaxed": { "$value": "1.65", "$type": "number", "$description": "Long-form body copy." }
+  }
+}

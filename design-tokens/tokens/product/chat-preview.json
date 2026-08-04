@@ -1,0 +1,14 @@
+{
+  "chat-preview": {
+    "width": {
+      "$value": "clamp(420px, 52.8vw, 540px)",
+      "$type": "dimension",
+      "$description": "PRODUCT-SCOPE — NOT PUBLISHED to the shared rare-tokens package. Fluid width of the hero chat-preview card (and its two-column grid track): 540px max above the medium breakpoint (~1024px), scaling down to a 420px floor through the medium band; capped to 100% on the narrowest phones. The 52.8vw term is calibrated against THIS page's full-width hero panel and resolves against the viewport, not the parent — inside any narrower container (sidebar, modal, split pane) it computes a wrong width. Kept in lockstep with chat-preview.font (30x ratio) so the card zooms as one unit."
+    },
+    "font": {
+      "$value": "clamp({font.size.200}, 1.76vw, {font.size.400})",
+      "$type": "dimension",
+      "$description": "PRODUCT-SCOPE — NOT PUBLISHED to the shared rare-tokens package. Master font size for the chat card: 18px above the medium breakpoint (~1024px), scaling to a 14px floor through the medium band. The card text inherits this, so text and width shrink together for a cohesive resize. The 1.76vw term is viewport-relative and page-calibrated; it is only correct in this page's hero context."
+    }
+  }
+}

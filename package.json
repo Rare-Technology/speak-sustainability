@@ -1,0 +1,18 @@
+{
+  "name": "speak-sustainability-site",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Speak Sustainability landing page — static pre-launch waitlist site. Sibling to Change Agent; same Rare Design System tokens/tooling. Node is a local dev-time tool only; the host serves committed static assets.",
+  "type": "module",
+  "scripts": {
+    "serve": "http-server . -p 8080 -c-1 --silent",
+    "lighthouse": "start-server-and-test serve http://127.0.0.1:8080 lighthouse:run",
+    "lighthouse:run": "lighthouse http://127.0.0.1:8080/ --budget-path=./lighthouse-budget.json --output=html --output=json --output-path=./.lighthouse/report.html --chrome-flags=\"--headless=new\" --quiet",
+    "tokens:build": "npm --prefix design-tokens run tokens:build"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1",
+    "lighthouse": "^12.2.1",
+    "start-server-and-test": "^2.0.8"
+  }
+}

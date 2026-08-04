@@ -1,0 +1,27 @@
+# Dependencies (Node is a local dev-time tool only; the built CSS is committed)
+node_modules/
+**/node_modules/
+
+# OS cruft
+.DS_Store
+**/.DS_Store
+
+# Logs
+*.log
+npm-debug.log*
+
+# Lighthouse reports (generated locally, not committed)
+.lighthouse/
+
+# Claude Code harness (local tooling, not part of the published site)
+.claude/
+
+# Internal build artifacts (kept out of the public repo)
+speak-sustainability-claude-code-prompt.md
+speak-sustainability-mockup-v1.png
+# Root-level duplicate source assets — the served copies live in assets/
+/hero-woman-340.webp
+/hero-woman-680.webp
+
+# Claude Code personal overrides (committed harness lives in .claude/settings.json)
+.claude/settings.local.json

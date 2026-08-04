@@ -1,0 +1,16 @@
+{
+  "space": {
+    "0":  { "$value": "0",    "$type": "dimension", "$description": "SCALE ANCHOR: the zero step of the 4px space ramp. Retained so the scale starts at an explicit, nameable origin and consumers can reset spacing via a token rather than a literal 0. Not dead." },
+    "1":  { "$value": "4px",  "$type": "dimension" },
+    "2":  { "$value": "8px",  "$type": "dimension" },
+    "3":  { "$value": "12px", "$type": "dimension" },
+    "4":  { "$value": "16px", "$type": "dimension" },
+    "5":  { "$value": "20px", "$type": "dimension" },
+    "6":  { "$value": "24px", "$type": "dimension", "$description": "Section gutter." },
+    "7":  { "$value": "32px", "$type": "dimension" },
+    "8":  { "$value": "40px", "$type": "dimension" },
+    "9":  { "$value": "48px", "$type": "dimension" },
+    "10": { "$value": "64px", "$type": "dimension" },
+    "11": { "$value": "72px", "$type": "dimension" }
+  }
+}

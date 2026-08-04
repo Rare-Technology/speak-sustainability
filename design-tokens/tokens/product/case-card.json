@@ -1,0 +1,14 @@
+{
+  "case-card": {
+    "width": {
+      "$value": "clamp(240px, 26vw, 320px)",
+      "$type": "dimension",
+      "$description": "PRODUCT-SCOPE — NOT PUBLISHED to the shared rare-tokens package. Fixed width of one use-case card in the horizontal scroller: 320px above the medium breakpoint (~1024px), scaling down to a 240px floor on the narrowest phones. The 26vw term is calibrated against THIS page's full-bleed scroller and resolves against the viewport, not the parent — inside any narrower container it computes a wrong width. Width is the only driver — height follows from case-card.aspect-ratio — so every card is identical in size and the ratio holds at every breakpoint."
+    },
+    "aspect-ratio": {
+      "$value": "3 / 4",
+      "$type": "number",
+      "$description": "PRODUCT-SCOPE — NOT PUBLISHED to the shared rare-tokens package. Portrait aspect ratio (width:height = 3:4) applied to every use-case card. Held constant across all breakpoints so cards only shrink, never re-proportion. Carries no viewport math itself, but is meaningless without case-card.width, so it ships with it."
+    }
+  }
+}

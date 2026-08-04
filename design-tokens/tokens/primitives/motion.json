@@ -1,0 +1,11 @@
+{
+  "motion": {
+    "duration": {
+      "fast": { "$value": "150ms", "$type": "duration", "$description": "Hover/color transitions." },
+      "base": { "$value": "200ms", "$type": "duration", "$description": "Accordion / transform transitions." }
+    },
+    "easing": {
+      "standard": { "$value": "cubic-bezier(0.2, 0, 0, 1)", "$type": "cubicBezier", "$description": "Standard ease." }
+    }
+  }
+}

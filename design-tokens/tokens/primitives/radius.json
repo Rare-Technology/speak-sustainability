@@ -1,0 +1,10 @@
+{
+  "radius": {
+    "sm":   { "$value": "4px",    "$type": "dimension", "$description": "Focus ring / small controls." },
+    "md":   { "$value": "8px",    "$type": "dimension", "$description": "Buttons, inputs." },
+    "lg":   { "$value": "12px",   "$type": "dimension", "$description": "Accordion items, chat bubbles." },
+    "card": { "$value": "14px",   "$type": "dimension", "$description": "Cards / chat panel — preserves v2's 14px." },
+    "xl":   { "$value": "24px",   "$type": "dimension", "$description": "Large hero panel. Normalized 22px→24px to sit on the 4px grid; the 2px delta is imperceptible at hero scale." },
+    "pill": { "$value": "9999px", "$type": "dimension", "$description": "Circular / pill controls." }
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "color": {
+    "blue": {
+      "50":  { "$value": "#E6F1FB", "$type": "color", "$description": "Rare Blue tint — chat-user surface, subtle blue fills." },
+      "500": { "$value": "#005BBB", "$type": "color", "$description": "Rare Blue — primary brand action color & hero brand surface." },
+      "600": { "$value": "#00499A", "$type": "color", "$description": "Rare Blue shade — primary action hover/active." }
+    },
+    "green": {
+      "500": { "$value": "#008542", "$type": "color", "$description": "Rare Green — brand-guide PRIMARY. Brand-guide palette value, retained in Core for cross-consumer use; may be unused on any given surface." }
+    },
+    "gray": {
+      "50":  { "$value": "#F4F6F8", "$type": "color", "$description": "Neutral 50 — base page canvas." },
+      "100": { "$value": "#E9EDF1", "$type": "color", "$description": "Neutral 100 — alternating section band / muted control fill." },
+      "200": { "$value": "#DDE3E8", "$type": "color", "$description": "Neutral 200 — default borders / hairlines." },
+      "700": { "$value": "#5E6A71", "$type": "color", "$description": "Rare Gray — muted text and strong borders." }
+    },
+    "red": {
+      "100": { "$value": "#F7E8ED", "$type": "color", "$description": "Secondary accent red tint — soft decorative surface." },
+      "500": { "$value": "#AA1948", "$type": "color", "$description": "Secondary accent — error/feedback; AA-safe reveal ink on its own tint." }
+    },
+    "cyan": {
+      "100": { "$value": "#E0F5FA", "$type": "color", "$description": "Secondary accent cyan tint — soft decorative surface." },
+      "500": { "$value": "#00AFD8", "$type": "color", "$description": "Rare Cyan — brand-guide SECONDARY. Brand-guide palette value, retained in Core for cross-consumer use; may be unused on any given surface." },
+      "700": { "$value": "#08627A", "$type": "color", "$description": "Secondary accent cyan shade — AA-safe reveal ink on cyan.100 (6.1:1)." }
+    },
+    "orange": {
+      "100": { "$value": "#FEF0E7", "$type": "color", "$description": "Secondary accent orange tint — soft decorative surface." },
+      "500": { "$value": "#F58233", "$type": "color", "$description": "Rare Orange — brand-guide SECONDARY. Brand-guide palette value, retained in Core for cross-consumer use; may be unused on any given surface." },
+      "700": { "$value": "#A34D17", "$type": "color", "$description": "Secondary accent orange shade — AA-safe reveal ink on orange.100 (5.2:1)." }
+    },
+    "lime": {
+      "100": { "$value": "#EFF7E0", "$type": "color", "$description": "Secondary accent lime tint — soft decorative surface." },
+      "500": { "$value": "#7AB800", "$type": "color", "$description": "Rare Lime — brand-guide SECONDARY. Brand-guide palette value, retained in Core for cross-consumer use; may be unused on any given surface." },
+      "700": { "$value": "#4A6B00", "$type": "color", "$description": "Secondary accent lime shade — AA-safe reveal ink on lime.100 (5.6:1)." }
+    },
+    "yellow": {
+      "100": { "$value": "#F3DE9A", "$type": "color", "$description": "Rare Yellow tint — Speak Sustainability featured/active use-case card surface. Deliberately richer than the other accents' .100 tints: gold at whisper strength reads as off-white, so the 'gold card' treatment needs a fuller tint to register. Added for Speak Sustainability; the mockup's gold accent has no equivalent in Change Agent's live palette." },
+      "500": { "$value": "#EEAF00", "$type": "color", "$description": "Rare Yellow — brand-guide SECONDARY. Also the decorative plus-mark graphic on the featured card." },
+      "700": { "$value": "#6E5200", "$type": "color", "$description": "Secondary accent yellow shade — AA-safe gold ink. 5.5:1 on yellow.100 (featured card copy) and 6.6:1 on background-subtle (the Use Cases eyebrow). Matches the .700 AA-safe-ink convention of the cyan/orange/lime accents." }
+    },
+    "white":  { "$value": "#FFFFFF", "$type": "color", "$description": "Pure white — raised surfaces, on-brand text." },
+    "ink":    { "$value": "#1A1D1F", "$type": "color", "$description": "Near-black ink — default body text." }
+  }
+}
