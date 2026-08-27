@@ -1,0 +1,123 @@
+// Speak Sustainability — signup / consent / install-access schema.
+//
+// New, dedicated Supabase Postgres project (Rare org) — explicitly NOT the
+// change-agent-app instance. Connection pattern copied verbatim from that
+// codebase: pooled connection for runtime, direct connection for migrations.
+// See docs/planning/skill-install-access-spec.md ("Technical architecture")
+// for the full rationale.
+//
+// RLS convention (copied from change-agent-app): RLS is enabled on every
+// table in the Supabase dashboard/SQL, but with ZERO policies — the app
+// connects via the Postgres owner role (via DATABASE_URL), which bypasses
+// RLS by ownership, same as change-agent-app. There are no end-user
+// accounts in this flow, so per-row access is enforced entirely in the API
+// layer (signed tokens), not in SQL. Enabling RLS with no policies is still
+// worth doing: it blocks the Supabase anon/authenticated API roles (which
+// this project never issues, but Supabase provisions by default) from ever
+// reading these tables directly.
+//
+// Phase 1 (this migration) only uses Token.kind = "confirm". The "access"
+// kind is modeled now so Phase 2 (90-day install-access tokens) is a new
+// row kind, not new plumbing.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_DATABASE_URL")
+}
+
+enum ReviewStatus {
+  pending
+  approved
+  held
+  rejected
+}
+
+enum TokenKind {
+  confirm // single-use, 30 min — double opt-in email confirmation (Phase 1)
+  access // multi-use, 90 days — gated install-page link (Phase 2, not issued yet)
+}
+
+// One row per signed-up email. Created on first signup submit;
+// consentConfirmedAt stays null until the double-opt-in click.
+model Contact {
+  id     String  @id @default(cuid())
+  email  String  @unique
+  role   String? // optional (Q6) — outreach context only, never used to gate access
+  organization String?
+
+  // --- Consent (GDPR-1, GDPR-8: two independent, per-purpose flags) ---
+  consentGivenAt         DateTime? // set on signup submit (access/transactional consent)
+  consentConfirmedAt     DateTime? // set on double opt-in click; null = not yet a confirmed contact
+  consentTextVersion     String? // which checkbox wording they agreed to (see lib/consent.js)
+  feedbackConsentGivenAt DateTime? // separate, optional (FR-1.7) — independent lawful basis
+
+  // --- Review / approval (FR-3.1/FR-3.3 — deferred, but the toggle exists now) ---
+  reviewStatus ReviewStatus @default(pending)
+
+  // --- Install-access email (Phase 2 — column exists now, unused until then) ---
+  installEmailSentAt DateTime?
+
+  // --- Abuse signals (salted hashes only — never raw IP) ---
+  sourceIpHash    String? // signup-time IP, salted+hashed (see lib/hash.js)
+  userAgent       String? // signup-time UA, coarse
+  confirmIpHash   String? // confirm-click-time IP, salted+hashed (FR-2.3 — not in the
+  confirmUserAgent String? // spec's literal Data Model table, added to satisfy FR-2.3's text)
+
+  // --- Retention / erasure (GDPR-4/GDPR-8/FR-2.4) ---
+  markedForDeletionAt DateTime? // set on unsubscribe/erasure request; purge job hard-deletes
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tokens Token[]
+
+  // Supports the FR-2.4 purge query: unconfirmed (consentConfirmedAt null)
+  // AND older than 7 days AND not already marked.
+  @@index([consentConfirmedAt, createdAt])
+  @@index([reviewStatus])
+}
+
+// Signed, single-use (confirm) or long-lived multi-use (access) tokens.
+// The emailed link carries an opaque, HMAC-signed string (see lib/tokens.js)
+// whose payload references `id` here; this row is the source of truth for
+// single-use enforcement, expiry, and manual revocation (SEC-2, SEC-7) —
+// the signature alone is not enough to know if a confirm link was already used.
+model Token {
+  id        String    @id @default(cuid())
+  contact   Contact   @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  contactId String
+  kind      TokenKind
+
+  issuedAt  DateTime  @default(now())
+  expiresAt DateTime
+  revokedAt DateTime? // manual revoke path (SEC-7); also used to invalidate superseded
+  // confirm tokens when a signup is resubmitted before the first link is used.
+  usedAt    DateTime? // set on first successful verification; confirm tokens are single-use
+  useCount  Int       @default(0) // access tokens (Phase 2) are multi-use; confirm tokens cap at 1
+
+  @@index([contactId, kind])
+  @@index([expiresAt])
+}
+
+// Every signup POST, successful or not — exists purely to support IP/email
+// rate limiting (FR-1.4: 5/hour) and abuse-heuristic logging (FR-3.4) without
+// needing a separate cache/Redis instance. Not part of the spec's literal
+// Data Model table; added because Contact is one-row-per-email and can't
+// hold a rolling window of attempts.
+model SignupAttempt {
+  id            String   @id @default(cuid())
+  emailAttempted String? // normalized email, even if the attempt was rejected
+  ipHash        String? // salted+hashed source IP
+  accepted      Boolean @default(false) // false = rate-limited, honeypot-tripped, or invalid
+  flagged       Boolean @default(false) // soft heuristic hit (fast fill, disposable domain, ...)
+  flagReason    String?
+  createdAt     DateTime @default(now())
+
+  @@index([emailAttempted, createdAt])
+  @@index([ipHash, createdAt])
+}

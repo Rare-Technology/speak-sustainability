@@ -63,8 +63,40 @@ These were called out in the brief as things to confirm rather than guess:
    vector wordmark + embedded leaf mark) is used in the nav and footer, sized by height
    (26px desktop / 22px mobile). Its `viewBox` was cropped to the content bounds so it sizes
    with no dead space. The nav pairs it with a separate "by Rare" sublabel (hidden on mobile).
-8. **Waitlist form** — submit is stubbed (validates, logs, no-ops with a `TODO`), matching
-   the Change Agent waitlist. Wire a real endpoint when ready.
+8. **Waitlist form** — now posts to a real backend (`api/signup.js`, see "Signup backend"
+   below). Superseded: it used to be stubbed (validate/log/no-op) like the Change Agent
+   waitlist.
+
+## Signup backend (Phase 1 of `docs/planning/skill-install-access-spec.md`)
+
+The waitlist form (`#signup` in `index.html`) now posts to small Vercel serverless
+functions in `api/`, backed by a dedicated Supabase Postgres project via Prisma
+(`prisma/schema.prisma`) — not the `change-agent-app` database. Double opt-in only;
+access-token issuance and the gated install page are later phases, not built yet.
+
+- `api/signup.js` — validates + rate-limits (5/hour per IP and per email), upserts a
+  `Contact`, and emails a 30-minute signed confirm link via Resend.
+- `api/confirm.js` — verifies the link, sets `consentConfirmedAt` + auto-approves, and
+  redirects to `confirmed.html` or `confirm-expired.html`.
+- `api/purge-unconfirmed.js` — deletes unconfirmed signups older than 7 days (FR-2.4).
+  **Not yet scheduled** — see the comment at the top of that file for how to wire up a
+  Vercel Cron trigger once this is ready to run automatically.
+- `privacy/index.html` — the privacy notice the consent checkbox links to.
+
+**Setup required before this works in any environment:**
+
+1. Copy `.env.example` to `.env` (local) or set the same keys in Vercel's env var UI.
+2. Create a new Supabase Postgres project under Rare's org (**not** `change-agent-app`'s)
+   and fill in `DATABASE_URL` (pooled, port 6543) / `DIRECT_DATABASE_URL` (direct, port
+   5432) from its connection settings.
+3. Run `npm run prisma:migrate:deploy` (applies `prisma/migrations/20260825000000_init/`),
+   then `npx prisma db execute --schema=prisma/schema.prisma --file=prisma/enable-rls.sql`
+   to enable RLS with zero policies on the new tables — matches `change-agent-app`'s
+   convention (see comments in `prisma/schema.prisma`); the app connects via the Postgres
+   owner role, which bypasses RLS by ownership, so this only blocks Supabase's default
+   anon/authenticated API roles from reading the tables directly.
+4. Set `RESEND_API_KEY` / `RESEND_FROM_EMAIL` for a domain with SPF/DKIM/DMARC verified
+   in Resend, and `CONFIRM_TOKEN_SECRET` / `IP_HASH_SALT` to long random values.
 
 ## Assets
 

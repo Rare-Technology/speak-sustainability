@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Link expired — Speak Sustainability</title>
+<meta name="description" content="This confirmation link has expired or was already used. Request a new one." />
+<meta name="robots" content="noindex,nofollow" />
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<link rel="preload" href="assets/fonts/source-sans-3-var-latin.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="stylesheet" href="assets/fonts/fonts.css" />
+<link rel="stylesheet" href="design-tokens/build/rare-tokens.css" />
+<style>
+  /* See confirmed.html for notes on this page's minimal, self-contained chrome. */
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:var(--rare-color-background-subtle);color:var(--rare-color-text-default);
+    font-family:var(--rare-font-family-text);font-size:var(--rare-font-size-400);
+    line-height:var(--rare-line-height-normal);-webkit-font-smoothing:antialiased;
+    min-height:100vh;display:flex;flex-direction:column;
+  }
+  a{color:inherit}
+  img{display:block;max-width:100%;height:auto}
+  .container{max-width:var(--rare-size-container);width:100%;margin:0 auto;padding-inline:var(--rare-space-6)}
+  @media (min-width:1025px){.container{padding-inline:var(--rare-space-11)}}
+  a:focus-visible,button:focus-visible,input:focus-visible{outline:var(--rare-border-width-focus) solid var(--rare-color-focus-ring)}
+
+  .nav{background:transparent}
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:var(--rare-space-6);padding-block:var(--rare-space-6)}
+  .nav-brand{display:inline-flex;align-items:center;gap:var(--rare-space-3)}
+  .nav-logo{display:inline-flex}
+  .nav-logo img{height:26px;width:auto}
+  .nav-by{font-family:var(--rare-font-family-text);font-weight:var(--rare-font-weight-semibold);font-size:var(--rare-font-size-300);color:var(--rare-color-text-muted);white-space:nowrap}
+  .nav-by a{color:inherit;text-decoration:none}
+  .nav-by a:hover,.nav-by a:focus-visible{text-decoration:underline}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;font-family:var(--rare-font-family-text);font-weight:var(--rare-font-weight-semibold);font-size:var(--rare-font-size-300);border:none;border-radius:var(--rare-radius-md);cursor:pointer;text-decoration:none;padding:var(--rare-space-2) var(--rare-space-5);transition:background var(--rare-motion-duration-fast) var(--rare-motion-easing-standard)}
+  .btn-primary{background:var(--rare-color-action-primary);color:var(--rare-color-text-on-brand)}
+  .btn-primary:hover{background:var(--rare-color-action-primary-hover)}
+  .btn-primary:disabled{opacity:.6;cursor:not-allowed}
+
+  main{flex:1 0 auto;display:flex;align-items:center;padding-block:var(--rare-space-11)}
+  .status-card{
+    max-width:520px;margin-inline:auto;text-align:center;
+    background:var(--rare-color-background-default);
+    border:var(--rare-border-width-default) solid var(--rare-color-border-default);
+    border-radius:var(--rare-radius-card);
+    padding:var(--rare-space-9) var(--rare-space-8);
+  }
+  .status-icon{
+    width:56px;height:56px;margin:0 auto var(--rare-space-5);
+    border-radius:var(--rare-radius-pill);
+    background:var(--rare-color-background-muted);
+    display:flex;align-items:center;justify-content:center;
+    color:var(--rare-color-text-muted);
+  }
+  .status-eyebrow{
+    font-family:var(--rare-font-family-display);font-weight:var(--rare-font-weight-bold);
+    text-transform:uppercase;letter-spacing:.04em;color:var(--rare-color-action-primary);
+    font-size:var(--rare-font-size-300);margin-bottom:var(--rare-space-2);
+  }
+  .status-heading{
+    font-family:var(--rare-font-family-display);font-weight:var(--rare-font-weight-bold);
+    font-size:var(--rare-font-size-700);line-height:var(--rare-line-height-tight);
+    margin-bottom:var(--rare-space-4);
+  }
+  .status-body{color:var(--rare-color-text-muted);font-size:var(--rare-font-size-400);margin-bottom:var(--rare-space-6)}
+
+  .resend-form{display:flex;flex-direction:column;gap:var(--rare-space-3);text-align:left}
+  .resend-form label{
+    font-family:var(--rare-font-family-display);font-weight:var(--rare-font-weight-bold);
+    font-size:var(--rare-font-size-200);text-transform:uppercase;letter-spacing:.04em;
+    color:var(--rare-color-text-muted);
+  }
+  .resend-form input[type=email]{
+    font-family:var(--rare-font-family-text);font-size:var(--rare-font-size-300);
+    color:var(--rare-color-text-default);background:var(--rare-color-background-default);
+    border:var(--rare-border-width-strong) solid var(--rare-color-border-strong);
+    border-radius:var(--rare-radius-md);padding:var(--rare-space-3) var(--rare-space-4);width:100%;
+  }
+  .resend-status{font-size:var(--rare-font-size-300);font-weight:var(--rare-font-weight-semibold);color:var(--rare-color-action-primary);min-height:1.5em}
+  .resend-status--error{color:var(--rare-color-feedback-error)}
+  .hp-field{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+  /* Specificity note: ".resend-form label" (above) would otherwise win on
+     font-family/weight/transform/color since this checkbox is also a <label>
+     nested inside .resend-form — ".resend-form .checkbox-field" out-ranks it. */
+  .resend-form .checkbox-field{display:flex;align-items:flex-start;gap:var(--rare-space-3);cursor:pointer;font-weight:var(--rare-font-weight-regular);text-transform:none;letter-spacing:normal;font-size:var(--rare-font-size-300);color:var(--rare-color-text-default);text-align:left}
+  .checkbox-field input[type=checkbox]{width:20px;height:20px;flex:0 0 auto;margin-top:2px;accent-color:var(--rare-color-action-primary)}
+  .checkbox-field a{color:var(--rare-color-action-primary);text-decoration:underline}
+
+  .footer{background:var(--rare-color-background-subtle);border-top:var(--rare-border-width-default) solid var(--rare-color-border-default);padding-block:var(--rare-space-6)}
+  .footer-legal{display:flex;flex-wrap:wrap;gap:var(--rare-space-4);justify-content:space-between;color:var(--rare-color-text-muted);font-size:var(--rare-font-size-200)}
+  .footer-legal a{color:inherit;text-decoration:underline}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container">
+    <nav class="nav-inner" aria-label="Primary">
+      <div class="nav-brand">
+        <a class="nav-logo" href="/" aria-label="Speak Sustainability — home">
+          <img src="assets/speak-sustainability-logo.svg" alt="Speak Sustainability" width="201" height="26" />
+        </a>
+        <span class="nav-by">by <a href="https://rare.org/">Rare</a></span>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <div class="status-card">
+      <div class="status-icon" aria-hidden="true">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v6M12 16.5v.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </div>
+      <p class="status-eyebrow">Link expired</p>
+      <h1 class="status-heading">That confirmation link isn't valid anymore.</h1>
+      <p class="status-body">
+        Confirmation links expire after 30 minutes, or may have already been
+        used. Enter your email below and we'll send a fresh one.
+      </p>
+
+      <form class="resend-form" id="resend-form" novalidate>
+        <div>
+          <label for="resend-email">Email address</label>
+          <input type="email" id="resend-email" name="email" required
+                 autocomplete="email" placeholder="you@organization.org" />
+        </div>
+        <!-- Re-affirms the same required consent as the main signup form
+             (FR-1.2) rather than assuming it — this page can be reached
+             directly (e.g. a stale bookmark) by someone who never saw the
+             original checkbox, so consent must be captured here too. -->
+        <label class="checkbox-field">
+          <input type="checkbox" id="resend-consent" name="consent_access" required />
+          <span>I agree to be contacted about pilot access and to <a href="/privacy/">Rare's privacy notice</a>.</span>
+        </label>
+        <!-- Honeypot — real visitors never see this field. Mirrors the main
+             signup form's bot filter (FR-1.3). -->
+        <div class="hp-field" aria-hidden="true">
+          <label for="resend-hp">Leave this field blank</label>
+          <input type="text" id="resend-hp" name="hp_field" tabindex="-1" autocomplete="off" />
+        </div>
+        <button type="submit" class="btn btn-primary" id="resend-submit">Send a new link</button>
+        <p class="resend-status" id="resend-status" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-legal">
+      <span>© 2026 Rare. All rights reserved.</span>
+      <a href="/privacy/">Privacy notice</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var form = document.getElementById("resend-form");
+  var status = document.getElementById("resend-status");
+  var submit = document.getElementById("resend-submit");
+  var renderedAt = Date.now();
+  if(!form) return;
+
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+    if(!form.checkValidity()){
+      status.classList.add("resend-status--error");
+      status.textContent = "Enter a valid email address.";
+      return;
+    }
+    var data = Object.fromEntries(new FormData(form).entries());
+    submit.disabled = true;
+    status.classList.remove("resend-status--error");
+    status.textContent = "Sending…";
+
+    // Reuses the same signup endpoint the main waitlist form posts to:
+    // resubmitting an unconfirmed email issues a fresh confirm token and
+    // resends the confirmation email (see api/signup.js).
+    fetch("/api/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: data.email,
+        consent_access: !!data.consent_access,
+        hp_field: data.hp_field || "",
+        form_rendered_at: renderedAt
+      })
+    }).then(function(res){
+      if(!res.ok && res.status !== 429) throw new Error("request_failed");
+      if(res.status === 429){
+        status.classList.add("resend-status--error");
+        status.textContent = "Too many attempts — please try again in a bit.";
+        return;
+      }
+      status.classList.remove("resend-status--error");
+      status.textContent = "Check your inbox for a new confirmation link.";
+      form.reset();
+    }).catch(function(){
+      status.classList.add("resend-status--error");
+      status.textContent = "Something went wrong — please try again.";
+    }).finally(function(){
+      submit.disabled = false;
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

@@ -25,3 +25,13 @@ speak-sustainability-mockup-v1.png
 
 # Claude Code personal overrides (committed harness lives in .claude/settings.json)
 .claude/settings.local.json
+
+# Backend secrets (DATABASE_URL, RESEND_API_KEY, CONFIRM_TOKEN_SECRET, ...) —
+# real values live in the hosting platform's env var UI, never in the repo.
+# .env.example is the committed template and stays tracked.
+.env
+.env.local
+.env*.local
+.env*
+!.env.example
+.vercel

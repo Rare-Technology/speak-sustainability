@@ -594,6 +594,30 @@
   .field input:invalid:not(:placeholder-shown){border-color:var(--rare-color-feedback-error)}
   .field-row{display:grid;gap:var(--rare-space-5)}
   @media (min-width:640px){.field-row{grid-template-columns:1fr 1fr}}
+
+  /* Consent checkboxes (FR-1.2 required, FR-1.7 optional) — two independent,
+     separately-unticked flags per GDPR-8, not bundled into one checkbox. */
+  .field-consent-group{gap:var(--rare-space-4)}
+  /* Specificity note: ".field label" (below) would otherwise win on
+     font-family/size/weight/transform/color since these checkboxes are also
+     <label> elements nested inside .field — ".field-consent-group .checkbox-field"
+     is deliberately two classes deep to out-rank it. */
+  .field-consent-group .checkbox-field{
+    display:flex;align-items:flex-start;gap:var(--rare-space-3);
+    cursor:pointer;font-family:var(--rare-font-family-text);
+    font-weight:var(--rare-font-weight-regular);text-transform:none;letter-spacing:normal;
+    font-size:var(--rare-font-size-300);color:var(--rare-color-text-default);
+  }
+  .checkbox-field input[type="checkbox"]{
+    width:20px;height:20px;flex:0 0 auto;margin-top:2px;
+    accent-color:var(--rare-color-action-primary);
+  }
+  .checkbox-field a{color:var(--rare-color-action-primary)}
+  .checkbox-field .req{color:var(--rare-color-action-primary)}
+
+  /* Honeypot (FR-1.3) — off-screen, not display:none/visibility:hidden, so it
+     still occupies normal DOM flow the way a naive scraper expects a field to. */
+  .hp-field{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
   .signup-submit{display:flex;align-items:center;gap:var(--rare-space-4);flex-wrap:wrap}
   .signup-submit .btn{text-transform:uppercase;letter-spacing:.03em;font-size:var(--rare-font-size-200);border-radius:var(--rare-radius-pill)}
   .signup-help{flex:1 1 16ch;color:var(--rare-color-text-muted);font-size:var(--rare-font-size-200);max-width:32ch}
@@ -1136,16 +1160,36 @@
 
         <div class="field-row">
           <div class="field">
-            <label for="role">Role <span class="req" aria-hidden="true">*</span></label>
-            <input type="text" id="role" name="role" required
+            <label for="role">Role</label>
+            <input type="text" id="role" name="role"
                    autocomplete="organization-title" placeholder="Your role" />
           </div>
           <div class="field">
-            <label for="org">Organization <span class="req" aria-hidden="true">*</span></label>
-            <input type="text" id="org" name="organization" required
+            <label for="org">Organization</label>
+            <input type="text" id="org" name="organization"
                    autocomplete="organization" placeholder="Your organization" />
           </div>
         </div>
+
+        <div class="field field-consent-group">
+          <label class="checkbox-field">
+            <input type="checkbox" id="consent-access" name="consent_access" required />
+            <span>I agree to be contacted about pilot access and to <a href="/privacy/" target="_blank" rel="noopener noreferrer">Rare's privacy notice</a>. <span class="req" aria-hidden="true">*</span></span>
+          </label>
+          <label class="checkbox-field">
+            <input type="checkbox" id="consent-feedback" name="consent_feedback" />
+            <span>I'm open to being contacted occasionally for feedback or input on the tool.</span>
+          </label>
+        </div>
+
+        <!-- Honeypot — hidden from real visitors (off-screen, not display:none, so it
+             still exists in the DOM/tab order the way naive bots expect a field to).
+             A filled value is treated as a bot signal server-side (FR-1.3). -->
+        <div class="hp-field" aria-hidden="true">
+          <label for="hp-field">Leave this field blank</label>
+          <input type="text" id="hp-field" name="hp_field" tabindex="-1" autocomplete="off" />
+        </div>
+        <input type="hidden" id="form-rendered-at" name="form_rendered_at" value="" />
 
         <div class="signup-submit">
           <button type="submit" class="btn btn-primary">Join the Waitlist</button>
@@ -1356,13 +1400,23 @@
   })();
 
   /* ---------------------------------------------------------
-     §5 WAITLIST FORM — stubbed submit, native + custom validation.
-     No backend specified: log and no-op, same as the reference site.
+     §5 WAITLIST FORM — posts to /api/signup (double opt-in: this only
+     records the signup + fires a confirmation email; nothing here claims
+     the visitor is "on the list" yet — that's true only once they click
+     the confirm link in their inbox, per FR-1.6).
      --------------------------------------------------------- */
   (function form(){
     var form = document.getElementById("waitlist-form");
     var status = document.getElementById("form-status");
+    var renderedAtField = document.getElementById("form-rendered-at");
     if(!form) return;
+
+    // Fill-time bot signal (FR-1.3) — stamped once, as early as possible,
+    // so server-side elapsed time reflects real time-on-page.
+    if(renderedAtField) renderedAtField.value = String(Date.now());
+
+    var submitBtn = form.querySelector('button[type="submit"]');
+
     form.addEventListener("submit", function(e){
       e.preventDefault();
       if(!form.checkValidity()){
@@ -1372,12 +1426,47 @@
         if(firstInvalid) firstInvalid.focus();
         return;
       }
-      // TODO: POST to the real waitlist endpoint here.
+
       var data = Object.fromEntries(new FormData(form).entries());
-      console.log("[waitlist] stub submit:", data);
+      var payload = {
+        email: data.email,
+        role: data.role || "",
+        organization: data.organization || "",
+        consent_access: !!data.consent_access,
+        consent_feedback: !!data.consent_feedback,
+        hp_field: data.hp_field || "",
+        form_rendered_at: Number(data.form_rendered_at) || null
+      };
+
+      if(submitBtn) submitBtn.disabled = true;
       status.classList.remove("form-status--error");
-      status.textContent = "Thanks — you're on the list. We'll be in touch.";
-      form.reset();
+      status.textContent = "Submitting…";
+
+      fetch("/api/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      }).then(function(res){
+        if(res.status === 429){
+          status.classList.add("form-status--error");
+          status.textContent = "Too many attempts — please try again in a bit.";
+          return;
+        }
+        if(!res.ok){
+          status.classList.add("form-status--error");
+          status.textContent = "Something went wrong — please try again.";
+          return;
+        }
+        status.classList.remove("form-status--error");
+        status.textContent = "Check your inbox to confirm your email — then we'll be in touch about pilot access.";
+        form.reset();
+        if(renderedAtField) renderedAtField.value = String(Date.now());
+      }).catch(function(){
+        status.classList.add("form-status--error");
+        status.textContent = "Something went wrong — please try again.";
+      }).finally(function(){
+        if(submitBtn) submitBtn.disabled = false;
+      });
     });
   })();
 
