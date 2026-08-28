@@ -16,9 +16,9 @@
 // this project never issues, but Supabase provisions by default) from ever
 // reading these tables directly.
 //
-// Phase 1 (this migration) only uses Token.kind = "confirm". The "access"
-// kind is modeled now so Phase 2 (90-day install-access tokens) is a new
-// row kind, not new plumbing.
+// Phase 1's migration modeled Token.kind = "access" ahead of use; Phase 2
+// (lib/tokens.js, api/confirm.js) now issues it — no schema change needed,
+// just a new row kind on the same table.
 
 generator client {
   provider = "prisma-client-js"
@@ -59,7 +59,7 @@ model Contact {
   // --- Review / approval (FR-3.1/FR-3.3 — deferred, but the toggle exists now) ---
   reviewStatus ReviewStatus @default(pending)
 
-  // --- Install-access email (Phase 2 — column exists now, unused until then) ---
+  // --- Install-access email (FR-4.2/FR-4.3, set in api/confirm.js on send) ---
   installEmailSentAt DateTime?
 
   // --- Abuse signals (salted hashes only — never raw IP) ---

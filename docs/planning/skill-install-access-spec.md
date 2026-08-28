@@ -80,7 +80,7 @@ Reuses the existing `#waitlist-form` in `index.html` (currently stubbed to `cons
 |---|---|---|
 | FR-4.1 | Separate email from confirmation, sent automatically right after confirmation (no approval wait), containing the signed install-page link + one-paragraph recap. | Must |
 | FR-4.2 | Access token is long-lived — **90 days** (Decided, Q2) — scoped to a single email address, individually revocable. | Must |
-| FR-4.3 | Send via **Resend** (Decided, Q3) — configure SPF/DKIM/DMARC on the sending domain. | Must |
+| FR-4.3 | Send via **Resend** (Decided, Q3), from **`speaksustainability.org`** — SPF/DKIM/DMARC records for that domain are the ones going to Rare IT (ticket #9749), currently pending propagation. `RESEND_FROM_EMAIL` is `hello@speaksustainability.org`, already set in Vercel Production and local `.env`. (`rare.org` was the original plan but was dropped: `speaksustainability.org` avoids `rare.org`'s existing SPF record entirely, matches the "Speak Sustainability" display name from Q9, and keeps this ticket's DNS changes in the one zone already being touched for the Vercel cutover — no cross-domain ambiguity.) | Must |
 | FR-4.4 | Footer contact address: **`bschauer@rare.org`** for alpha (Decided, Q5). Swap to a team-owned inbox before Climate Week launch, and reassess again after. | Must |
 
 ### 5 — Install page & package gating

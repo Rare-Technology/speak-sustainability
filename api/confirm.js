@@ -1,8 +1,11 @@
-// GET /api/confirm?t=<signed token> — FR-2.2/FR-2.3, FR-3.1
+// GET /api/confirm?t=<signed token> — FR-2.2/FR-2.3, FR-3.1, FR-4.1/4.2
 //
 // Verifies the emailed confirm link and redirects to a static landing page —
 // never renders a raw error/stack trace (FR-2.2). Auto-approves on
-// confirmation (Q1/FR-3.1: no manual review for Alpha/Climate Week).
+// confirmation (Q1/FR-3.1: no manual review for Alpha/Climate Week, gated
+// through lib/approval.js so that can change later without touching this
+// file) and, when approved, issues a 90-day access token and sends the
+// install-access email (FR-4.1/4.2) right after.
 //
 // Idempotent-on-replay: many mail clients (Outlook Safe Links, Apple Mail
 // Privacy Protection, link-preview bots) GET-fetch links automatically
@@ -10,10 +13,14 @@
 // before the real click. If the token's owning contact is already
 // confirmed, re-visiting the same (now "used") link still lands on the
 // success page instead of "expired" — only a token that never successfully
-// confirmed anyone shows the expired/re-request page.
+// confirmed anyone shows the expired/re-request page. This also keeps
+// access-token issuance and the install-access email to a single send: that
+// block only ever runs the one time the confirm token is actually consumed.
 import { prisma } from "../lib/prisma.js";
-import { decodeAndVerifyToken } from "../lib/tokens.js";
+import { decodeAndVerifyToken, buildAccessToken, accessTokenExpiry } from "../lib/tokens.js";
 import { hashIp, getClientIp, getUserAgent } from "../lib/hash.js";
+import { shouldAutoApprove } from "../lib/approval.js";
+import { sendInstallAccessEmail } from "../lib/email.js";
 
 function redirect(res, path) {
   res.writeHead(302, { Location: path });
@@ -30,7 +37,7 @@ export default async function handler(req, res) {
   const raw = req.query?.t;
   const tokenString = Array.isArray(raw) ? raw[0] : raw;
 
-  const payload = tokenString ? decodeAndVerifyToken(tokenString) : null;
+  const payload = tokenString ? decodeAndVerifyToken(tokenString, "confirm") : null;
   if (!payload) {
     redirect(res, "/confirm-expired.html");
     return;
@@ -65,6 +72,7 @@ export default async function handler(req, res) {
     const ipHash = hashIp(ip);
     const userAgent = getUserAgent(req);
     const now = new Date();
+    const approved = shouldAutoApprove(); // FR-3.3
 
     await prisma.$transaction([
       prisma.token.update({
@@ -76,12 +84,39 @@ export default async function handler(req, res) {
         data: {
           // Idempotent: don't clobber an earlier confirmedAt if this somehow runs twice.
           consentConfirmedAt: tokenRow.contact.consentConfirmedAt ?? now,
-          reviewStatus: "approved", // FR-3.1 — auto-approve, Alpha/Climate Week only
+          reviewStatus: approved ? "approved" : "pending", // FR-3.1
           confirmIpHash: ipHash,
           confirmUserAgent: userAgent,
         },
       }),
     ]);
+
+    if (approved) {
+      // Deliberately outside the transaction above — issuing a token and
+      // sending an email are not things that need DB-transactional atomicity
+      // with the confirm write, and an email API call shouldn't hold a
+      // transaction's locks open. A failure here doesn't undo the
+      // confirmation: the contact stays confirmed/approved either way, and
+      // installEmailSentAt simply stays null for manual follow-up (FR-3.2).
+      try {
+        const expiresAt = accessTokenExpiry();
+        const accessTokenRow = await prisma.token.create({
+          data: { contactId: tokenRow.contactId, kind: "access", expiresAt },
+        });
+        const signedAccessToken = buildAccessToken({
+          tokenId: accessTokenRow.id,
+          contactId: tokenRow.contactId,
+          expiresAt,
+        });
+        await sendInstallAccessEmail({ to: tokenRow.contact.email, token: signedAccessToken });
+        await prisma.contact.update({
+          where: { id: tokenRow.contactId },
+          data: { installEmailSentAt: new Date() },
+        });
+      } catch (err) {
+        console.error("[api/confirm] install-access email failed", err);
+      }
+    }
 
     redirect(res, "/confirmed.html");
   } catch (err) {

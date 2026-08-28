@@ -12,7 +12,8 @@
     "postinstall": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:migrate:deploy": "prisma migrate deploy",
-    "prisma:studio": "prisma studio"
+    "prisma:studio": "prisma studio",
+    "contacts:approved": "node scripts/list-approved-contacts.mjs"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",

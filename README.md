@@ -67,21 +67,32 @@ These were called out in the brief as things to confirm rather than guess:
    below). Superseded: it used to be stubbed (validate/log/no-op) like the Change Agent
    waitlist.
 
-## Signup backend (Phase 1 of `docs/planning/skill-install-access-spec.md`)
+## Signup backend (Phases 1–2 of `docs/planning/skill-install-access-spec.md`)
 
-The waitlist form (`#signup` in `index.html`) now posts to small Vercel serverless
+The waitlist form (`#signup` in `index.html`) posts to small Vercel serverless
 functions in `api/`, backed by a dedicated Supabase Postgres project via Prisma
-(`prisma/schema.prisma`) — not the `change-agent-app` database. Double opt-in only;
-access-token issuance and the gated install page are later phases, not built yet.
+(`prisma/schema.prisma`) — not the `change-agent-app` database. Double opt-in signup
+through install-access-email issuance is built; the gated install page itself
+(Phase 3) is not.
 
 - `api/signup.js` — validates + rate-limits (5/hour per IP and per email), upserts a
   `Contact`, and emails a 30-minute signed confirm link via Resend.
-- `api/confirm.js` — verifies the link, sets `consentConfirmedAt` + auto-approves, and
-  redirects to `confirmed.html` or `confirm-expired.html`.
+- `api/confirm.js` — verifies the link, sets `consentConfirmedAt`, and auto-approves
+  (`lib/approval.js` — a config flag, `AUTO_APPROVE_CONTACTS`, not hardcoded, so
+  switching to manual review later doesn't touch this file). On approval it issues a
+  90-day signed access token and sends the install-access email
+  (`lib/email.js#sendInstallAccessEmail`), then redirects to `confirmed.html` or
+  `confirm-expired.html`.
 - `api/purge-unconfirmed.js` — deletes unconfirmed signups older than 7 days (FR-2.4).
   **Not yet scheduled** — see the comment at the top of that file for how to wire up a
   Vercel Cron trigger once this is ready to run automatically.
 - `privacy/index.html` — the privacy notice the consent checkbox links to.
+- `access-pending.html` — placeholder page the install-access email links to
+  (`/access/<token>`, rewritten in `vercel.json`). Renders the same "you're
+  approved, full instructions land here soon" content for any token — it does
+  **not** verify the token; real gating is Phase 3 (FR-5.1–5.6).
+- `scripts/list-approved-contacts.mjs` (`npm run contacts:approved`) — FR-3.2,
+  queryable list of confirmed/approved contacts. No UI at this scale.
 
 **Setup required before this works in any environment:**
 

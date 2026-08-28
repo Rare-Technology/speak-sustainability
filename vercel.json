@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/access/:token", "destination": "/access-pending.html" }
+  ]
+}
