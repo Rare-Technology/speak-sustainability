@@ -67,13 +67,14 @@ These were called out in the brief as things to confirm rather than guess:
    below). Superseded: it used to be stubbed (validate/log/no-op) like the Change Agent
    waitlist.
 
-## Signup backend (Phases 1–2 of `docs/planning/skill-install-access-spec.md`)
+## Signup backend (Phases 1–3 of `docs/planning/skill-install-access-spec.md`)
 
 The waitlist form (`#signup` in `index.html`) posts to small Vercel serverless
 functions in `api/`, backed by a dedicated Supabase Postgres project via Prisma
 (`prisma/schema.prisma`) — not the `change-agent-app` database. Double opt-in signup
-through install-access-email issuance is built; the gated install page itself
-(Phase 3) is not.
+through install-access-email issuance through the gated install page and token-gated
+package downloads are all built; Phase 4 (troubleshooting/ops polish beyond what's
+already in `install.html`, revoke tooling, scheduled purge jobs) is not.
 
 - `api/signup.js` — validates + rate-limits (5/hour per IP and per email), upserts a
   `Contact`, and emails a 30-minute signed confirm link via Resend.
@@ -83,16 +84,36 @@ through install-access-email issuance is built; the gated install page itself
   90-day signed access token and sends the install-access email
   (`lib/email.js#sendInstallAccessEmail`), then redirects to `confirmed.html` or
   `confirm-expired.html`.
+- `api/access.js` — FR-5.1, the real `/access/:token` handler (`vercel.json` rewrites
+  the path here). Verifies the access token server-side (`lib/accessToken.js` — multi-use,
+  unlike the confirm token, so no single-use/replay check), logs the view and bumps the
+  token's usage counters (`lib/accessLog.js`), and serves `install.html`'s content. An
+  invalid/expired/revoked token redirects to `access-expired.html` instead (FR-5.5).
+- `install.html` — the real install page content (FR-6): path selection, the platform
+  tab bar and package downloads (Path A), the CLI terminal block (Path B), the
+  verification prompt, and a troubleshooting accordion. Reads its own access token out
+  of `location.pathname` client-side (the URL stays `/access/<token>` — it's a rewrite,
+  not a redirect) to build its two download links.
+- `api/access-download.js` — FR-5.2/5.3, the token-gated package download route
+  (`?t=<token>&variant=standard|claude`). Same token check as `api/access.js`, then
+  streams the requested `.zip` from private Vercel Blob storage — see "Package storage"
+  below.
+- `access-expired.html` — FR-5.5, plain on-brand page for an invalid/expired/revoked
+  access token (no self-service resend, unlike `confirm-expired.html` — just a support
+  contact).
 - `api/purge-unconfirmed.js` — deletes unconfirmed signups older than 7 days (FR-2.4).
   **Not yet scheduled** — see the comment at the top of that file for how to wire up a
   Vercel Cron trigger once this is ready to run automatically.
+- `api/purge-access-logs.js` — deletes `AccessLog` rows older than 90 days (spec
+  retention: "90 days rolling, then aggregate-only" — the surviving aggregate is
+  `Token.usedAt`/`useCount`, never purged). **Not yet scheduled**, same as above.
+- `robots.txt` — disallows the `/access` path prefix (FR-5.4); `install.html` and
+  `access-expired.html` also carry their own `noindex,nofollow` meta tag.
 - `privacy/index.html` — the privacy notice the consent checkbox links to.
-- `access-pending.html` — placeholder page the install-access email links to
-  (`/access/<token>`, rewritten in `vercel.json`). Renders the same "you're
-  approved, full instructions land here soon" content for any token — it does
-  **not** verify the token; real gating is Phase 3 (FR-5.1–5.6).
 - `scripts/list-approved-contacts.mjs` (`npm run contacts:approved`) — FR-3.2,
   queryable list of confirmed/approved contacts. No UI at this scale.
+- `scripts/sync-skill-package.mjs` (`npm run skill:sync`) — manual, not scheduled;
+  see "Package storage" below.
 
 **Setup required before this works in any environment:**
 
@@ -100,14 +121,35 @@ through install-access-email issuance is built; the gated install page itself
 2. Create a new Supabase Postgres project under Rare's org (**not** `change-agent-app`'s)
    and fill in `DATABASE_URL` (pooled, port 6543) / `DIRECT_DATABASE_URL` (direct, port
    5432) from its connection settings.
-3. Run `npm run prisma:migrate:deploy` (applies `prisma/migrations/20260825000000_init/`),
-   then `npx prisma db execute --schema=prisma/schema.prisma --file=prisma/enable-rls.sql`
+3. Run `npm run prisma:migrate:deploy` (applies `prisma/migrations/20260825000000_init/`
+   and `prisma/migrations/20260828120000_access_log/`), then
+   `npx prisma db execute --schema=prisma/schema.prisma --file=prisma/enable-rls.sql`
    to enable RLS with zero policies on the new tables — matches `change-agent-app`'s
    convention (see comments in `prisma/schema.prisma`); the app connects via the Postgres
    owner role, which bypasses RLS by ownership, so this only blocks Supabase's default
    anon/authenticated API roles from reading the tables directly.
 4. Set `RESEND_API_KEY` / `RESEND_FROM_EMAIL` for a domain with SPF/DKIM/DMARC verified
    in Resend, and `CONFIRM_TOKEN_SECRET` / `IP_HASH_SALT` to long random values.
+5. Set up package storage (below) before `/access/:token` can serve real downloads.
+
+### Package storage (Phase 3, FR-5.2/5.3)
+
+The two package `.zip` variants (standard + Claude-specific) live in **private Vercel
+Blob storage**, not this repo — the upstream skill repo (`ethulin/climate-comms-review`)
+is private, and this site's repo is public, so committing the zips here would make them
+trivially fetchable and defeat the whole point of gating downloads.
+
+1. Create a Blob store for this project (Vercel dashboard → Storage, or
+   `vercel integration add blob`) — this auto-sets `BLOB_READ_WRITE_TOKEN` in the linked
+   Vercel environments.
+2. Locally: `vercel env pull .env` (or export `BLOB_READ_WRITE_TOKEN` yourself), make
+   sure `gh` is authenticated with read access to the private upstream repo, then run
+   `npm run skill:sync`. This downloads the current GitHub release's two assets and
+   uploads them to Blob at fixed pathnames (`lib/skillPackage.js`).
+3. Re-run `npm run skill:sync` (optionally with `RELEASE_TAG=vX.Y.Z`) whenever you want
+   to deliberately adopt a new upstream release — this is a manual, not-scheduled step
+   on purpose, so already-emailed 90-day access links never silently change what they
+   serve underneath a recipient.
 
 ## Assets
 

@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>You're approved — Speak Sustainability</title>
-<meta name="description" content="Your Climate Comms Review access link is active. Install instructions land here very soon." />
+<title>Access link not valid — Speak Sustainability</title>
+<meta name="description" content="This access link has expired or been revoked." />
 <meta name="robots" content="noindex,nofollow" />
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
 <link rel="preload" href="assets/fonts/source-sans-3-var-latin.woff2" as="font" type="font/woff2" crossorigin />
@@ -12,17 +12,10 @@
 <link rel="stylesheet" href="design-tokens/build/rare-tokens.css" />
 <style>
   /* Same minimal, self-contained chrome as confirmed.html / confirm-expired.html
-     (post-email utility pages) — see those files for why this isn't factored
-     into a shared stylesheet yet.
-
-     This is a placeholder only: Phase 2 issues the 90-day access link and
-     sends this URL by email (docs/planning/skill-install-access-spec.md,
-     FR-4.1/4.2) before Phase 3's real gated install page (FR-5.1-5.6) exists.
-     It intentionally does NOT verify the token in the URL — it renders the
-     same content for any /access/:token hit (see vercel.json). Phase 3
-     replaces the vercel.json destination with a real token-checked route;
-     this file can then either be deleted or kept as the expired/invalid
-     fallback state. */
+     (post-email utility pages). FR-5.5: a plain, on-brand page for an
+     invalid/expired/revoked access token — not a 404. Unlike
+     confirm-expired.html there's no self-service resend form: a 90-day
+     access link has no re-request flow, just a support contact. */
   *{box-sizing:border-box;margin:0;padding:0}
   body{
     background:var(--rare-color-background-subtle);color:var(--rare-color-text-default);
@@ -62,7 +55,7 @@
     border-radius:var(--rare-radius-pill);
     background:var(--rare-color-background-muted);
     display:flex;align-items:center;justify-content:center;
-    color:var(--rare-color-action-primary);
+    color:var(--rare-color-text-muted);
   }
   .status-eyebrow{
     font-family:var(--rare-font-family-display);font-weight:var(--rare-font-weight-bold);
@@ -75,6 +68,7 @@
     margin-bottom:var(--rare-space-4);
   }
   .status-body{color:var(--rare-color-text-muted);font-size:var(--rare-font-size-400);margin-bottom:var(--rare-space-6)}
+  .status-body a{color:var(--rare-color-action-primary)}
 
   .footer{background:var(--rare-color-background-subtle);border-top:var(--rare-border-width-default) solid var(--rare-color-border-default);padding-block:var(--rare-space-6)}
   .footer-legal{display:flex;flex-wrap:wrap;gap:var(--rare-space-4);justify-content:space-between;color:var(--rare-color-text-muted);font-size:var(--rare-font-size-200)}
@@ -100,14 +94,14 @@
   <div class="container">
     <div class="status-card">
       <div class="status-icon" aria-hidden="true">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3.5 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v6M12 16.5v.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
       </div>
-      <p class="status-eyebrow">Access granted</p>
-      <h1 class="status-heading">You're approved — full instructions land here very soon.</h1>
+      <p class="status-eyebrow">Link not valid</p>
+      <h1 class="status-heading">This access link isn't valid anymore.</h1>
       <p class="status-body">
-        Your access link for Climate Comms Review is active and stays valid
-        for 90 days. We're still finishing the install page itself — check
-        back here, or watch your inbox. Questions in the meantime?
+        It may have expired (access links are valid for 90 days from when
+        they were sent) or been revoked. If you think this is a mistake, or
+        you'd like a fresh link, email
         <a href="mailto:bschauer@rare.org">bschauer@rare.org</a>.
       </p>
       <a class="btn btn-primary" href="/">Back to Speak Sustainability</a>

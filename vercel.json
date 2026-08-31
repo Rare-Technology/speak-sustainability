@@ -1,5 +1,10 @@
 {
   "rewrites": [
-    { "source": "/access/:token", "destination": "/access-pending.html" }
-  ]
+    { "source": "/access/:token", "destination": "/api/access?t=:token" }
+  ],
+  "functions": {
+    "api/access.js": {
+      "includeFiles": "install.html"
+    }
+  }
 }

@@ -42,6 +42,11 @@ enum TokenKind {
   access // multi-use, 90 days — gated install-page link (Phase 2, not issued yet)
 }
 
+enum AccessEventType {
+  page_view
+  download
+}
+
 // One row per signed-up email. Created on first signup submit;
 // consentConfirmedAt stays null until the double-opt-in click.
 model Contact {
@@ -97,11 +102,39 @@ model Token {
   expiresAt DateTime
   revokedAt DateTime? // manual revoke path (SEC-7); also used to invalidate superseded
   // confirm tokens when a signup is resubmitted before the first link is used.
+  // Meaning of usedAt/useCount differs by kind: for "confirm" tokens usedAt is
+  // the single confirm-click timestamp (useCount caps at 1). For "access"
+  // tokens (multi-use, FR-4.2) api/access.js and api/access-download.js bump
+  // both on every valid hit, so usedAt becomes "last used at" and useCount is
+  // the running total — the permanent aggregate that survives AccessLog's
+  // 90-day purge (see AccessLog below).
   usedAt    DateTime? // set on first successful verification; confirm tokens are single-use
   useCount  Int       @default(0) // access tokens (Phase 2) are multi-use; confirm tokens cap at 1
 
+  accessLogs AccessLog[]
+
   @@index([contactId, kind])
   @@index([expiresAt])
+}
+
+// Every valid /access/:token page view and package download — FR-5.6.
+// Purely additive detail alongside Token.usedAt/useCount (the permanent,
+// never-purged aggregate); these raw rows are purge-eligible after 90 days
+// (see api/purge-access-logs.js, not yet scheduled — same convention as
+// api/purge-unconfirmed.js). Invalid/expired token hits are NOT logged here
+// — only successful views/downloads, per FR-5.6's literal scope.
+model AccessLog {
+  id             String          @id @default(cuid())
+  token          Token           @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+  tokenId        String
+  eventType      AccessEventType
+  packageVariant String? // "standard" | "claude" — set only for eventType = download
+  ipHash         String? // same salted-hash convention as Contact (lib/hash.js)
+  userAgent      String?
+  createdAt      DateTime        @default(now())
+
+  @@index([tokenId, createdAt])
+  @@index([createdAt])
 }
 
 // Every signup POST, successful or not — exists purely to support IP/email
