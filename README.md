@@ -130,7 +130,11 @@ already in `install.html`, revoke tooling, scheduled purge jobs) is not.
    anon/authenticated API roles from reading the tables directly.
 4. Set `RESEND_API_KEY` / `RESEND_FROM_EMAIL` for a domain with SPF/DKIM/DMARC verified
    in Resend, and `CONFIRM_TOKEN_SECRET` / `IP_HASH_SALT` to long random values.
-5. Set up package storage (below) before `/access/:token` can serve real downloads.
+5. Run `npm run env:check` after editing `.env` by hand — a cheap guard (`lib/envGuard.js`)
+   that catches `DATABASE_URL`/`DIRECT_DATABASE_URL` being swapped before it reaches
+   production. It also runs automatically on every cold start via `lib/prisma.js`, but
+   catching it here is faster than waiting for a deploy to fail.
+6. Set up package storage (below) before `/access/:token` can serve real downloads.
 
 ### Package storage (Phase 3, FR-5.2/5.3)
 
@@ -142,10 +146,15 @@ trivially fetchable and defeat the whole point of gating downloads.
 1. Create a Blob store for this project (Vercel dashboard → Storage, or
    `vercel integration add blob`) — this auto-sets `BLOB_READ_WRITE_TOKEN` in the linked
    Vercel environments.
-2. Locally: `vercel env pull .env` (or export `BLOB_READ_WRITE_TOKEN` yourself), make
-   sure `gh` is authenticated with read access to the private upstream repo, then run
-   `npm run skill:sync`. This downloads the current GitHub release's two assets and
-   uploads them to Blob at fixed pathnames (`lib/skillPackage.js`).
+2. Locally: pull just that one token to a **separate file**, never directly onto `.env` —
+   `vercel env pull .env.blob-check` and copy the `BLOB_READ_WRITE_TOKEN` line into `.env`
+   by hand, then delete `.env.blob-check`. (`vercel env pull` overwrites every Sensitive
+   var in whatever file you point it at with an empty string — see FR-4.3's note in
+   `docs/planning/skill-install-access-spec.md` — so pulling straight onto a `.env` that
+   already has real secrets in it silently blanks all of them, not just the one you
+   wanted.) Make sure `gh` is authenticated with read access to the private upstream
+   repo, then run `npm run skill:sync`. This downloads the current GitHub release's two
+   assets and uploads them to Blob at fixed pathnames (`lib/skillPackage.js`).
 3. Re-run `npm run skill:sync` (optionally with `RELEASE_TAG=vX.Y.Z`) whenever you want
    to deliberately adopt a new upstream release — this is a manual, not-scheduled step
    on purpose, so already-emailed 90-day access links never silently change what they
