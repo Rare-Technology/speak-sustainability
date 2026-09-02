@@ -14,7 +14,7 @@
     "prisma:migrate:deploy": "prisma migrate deploy",
     "prisma:studio": "prisma studio",
     "contacts:approved": "node scripts/list-approved-contacts.mjs",
-    "skill:sync": "node scripts/sync-skill-package.mjs"
+    "skill:sync": "node --env-file=.env scripts/sync-skill-package.mjs"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
