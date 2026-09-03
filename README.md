@@ -224,4 +224,3 @@ never retries a failed cron. Explicitly out of scope for Phase 4; revisit if it 
   `<picture>`/`srcset` (mirrors the reference site's `hero-bicycle-*` pattern).
 - `assets/fonts/` — self-hosted Source Sans 3 + Barlow Semi Condensed (OFL).
 
-<!-- deploy-test: confirming push-to-deploy works after clearing Ignored Build Step (2026-09-03) -->
