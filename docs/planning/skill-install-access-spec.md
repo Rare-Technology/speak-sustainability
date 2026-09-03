@@ -1,6 +1,6 @@
 # Skill Install Access — Plan & Spec
 
-**Status:** Decisions locked (Q1–Q9) — Phase 0 complete, starting Phase 1
+**Status:** Decisions locked (Q1–Q9) — Phases 0–4 complete and live (2026-09-02); Phase 5 (prototypes) not started. Open before Climate Week launch: move the support contact off `bschauer@rare.org` (FR-4.4/Q5, still alpha-scoped by decision).
 **Site:** speaksustainability (static, no backend today)
 **Skill:** ethulin/climate-comms-review ("Climate Comms Review")
 **Live version of this doc:** https://claude.ai/code/artifact/c4d11324-39a7-47b7-8d6d-f14ddde774c6 (styled, may be ahead of this file if edited there directly — treat this file as the source of truth for implementation)
@@ -238,12 +238,12 @@ All three emails: **From** display name `"Speak Sustainability"` (Decided, Q9).
 
 | Phase | Scope |
 |---|---|
-| 0 — This document | Agree scope, resolve decisions (**done**, 2026-08-25), hand off to visual mockups. |
-| **1 — Signup + consent** | Required access-consent checkbox + separate optional feedback/input checkbox (Q8), role/org made optional (Q6), honeypot, real endpoint, confirmation email (Resend) + double opt-in landing state. **← starting here** |
-| 2 — Access issuance | Auto-approve on confirmation (Q1) behind a config flag (FR-3.3), 90-day access-token issuance (Q2), install-access email. |
-| 3 — Gated install page + download | Token verification for both the page and package downloads (Q4), path-selection + Path A/B content, tab component, terminal block, verification section, crawler blocking (Q7). |
-| 4 — Troubleshooting & ops | FAQ accordion, support contact wired to `bschauer@rare.org` (Q5, alpha only), revoke tooling, retention/purge jobs, feedback-consented contact export (Q8). |
-| 5 — Prototypes | High-fidelity mockups of the install page and emails from this spec. |
+| 0 — This document | Agree scope, resolve decisions, hand off to visual mockups. (**done**, 2026-08-25) |
+| 1 — Signup + consent | Required access-consent checkbox + separate optional feedback/input checkbox (Q8), role/org made optional (Q6), honeypot, real endpoint, confirmation email (Resend) + double opt-in landing state. (**done**) |
+| 2 — Access issuance | Auto-approve on confirmation (Q1) behind a config flag (FR-3.3), 90-day access-token issuance (Q2), install-access email. (**done**) |
+| 3 — Gated install page + download | Token verification for both the page and package downloads (Q4), path-selection + Path A/B content, tab component, terminal block, verification section, crawler blocking (Q7). Also delivered the FAQ accordion (FR-6.5) originally slotted into Phase 4. (**done**) |
+| 4 — Troubleshooting & ops | Retention/purge jobs scheduled (Vercel Cron, GET + `Authorization: Bearer $CRON_SECRET`), revoke tooling (SEC-7), feedback-consented contact export (Q8). Support contact stays `bschauer@rare.org` by decision — alpha-scoped, not yet swapped. Beyond the original scope: erasure tooling wiring up `markedForDeletionAt` (GDPR-4, previously written by nothing) and an access re-issue script, the recovery path `access-expired.html` already promised. Key versioning for token signing considered and **explicitly deferred** — it addresses routine rotation, not compromise, and stays additive later. DB monitoring/alerting **explicitly out of scope**. (**done**, 2026-09-02) |
+| **5 — Prototypes** | High-fidelity mockups of the install page and emails from this spec. **← next** |
 
 **Milestones:** Alpha testing (phases 1–4 as specified) → Climate Week launch (same flow; move support contact off a personal inbox) → Post-launch (revisit manual review, support contact's long-term home, and crawler/AI-discoverability policy together).
 

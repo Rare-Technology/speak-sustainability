@@ -1,50 +1,60 @@
-// POST /api/purge-unconfirmed — FR-2.4: unconfirmed signups auto-purge after 7 days.
+// GET|POST /api/purge-unconfirmed — scheduled retention deletion.
 //
-// STUB / NOT WIRED TO A SCHEDULER YET. This function is safe to call and
-// does the real deletion, but nothing invokes it on a schedule in this
-// session. To finish wiring it up:
+// Two things get hard-deleted here:
+//   1. FR-2.4 — signups that never confirmed, older than 7 days.
+//   2. GDPR-4 — contacts explicitly marked for erasure
+//      (Contact.markedForDeletionAt, set by scripts/mark-for-erasure.mjs),
+//      regardless of age or confirmation state. The schema has always said
+//      "hard-deleted on next purge run"; this is the run that does it.
 //
-//   1. Set a PURGE_JOB_SECRET env var (any long random string).
-//   2. Add a Vercel Cron entry to vercel.json, e.g.:
-//        { "crons": [{ "path": "/api/purge-unconfirmed", "schedule": "0 6 * * *" }] }
-//      (Vercel Cron requires a paid plan for schedules more frequent than
-//      once/day on some tiers — confirm against the current Vercel pricing
-//      page for this project's plan before relying on it.)
-//   3. Vercel signs cron-triggered requests with an Authorization header
-//      (see https://vercel.com/docs/cron-jobs/manage-cron-jobs#securing-cron-jobs) —
-//      this stub instead checks a shared-secret header as a simpler
-//      alternative; swap to Vercel's signature verification if preferred.
+// Deleting a Contact cascades to its Token rows, which cascade to AccessLog
+// rows (see prisma/schema.prisma) — so an erasure takes the access links and
+// the view history with it, which is the point.
 //
-// Left unwired deliberately per Phase 1 scope (schema/query only; scheduling
-// is Phase 4 — "retention/purge jobs").
+// SCHEDULED via the `crons` array in vercel.json (Phase 4). Vercel Cron makes
+// an HTTP GET carrying `Authorization: Bearer $CRON_SECRET`; a human can also
+// trigger a run on demand with POST + `x-purge-job-secret`. Both credentials
+// are checked in lib/cronAuth.js — see that file for the details.
+//
+// Idempotency: Vercel cron delivery is best-effort and can occasionally fire
+// the same scheduled run twice. Both deletes below are cutoff-based
+// deleteMany calls, so a duplicate run simply deletes nothing the second
+// time. Vercel also never retries a failed invocation — a missed night is
+// picked up by the next run, since the cutoff is always computed from "now"
+// rather than from a last-run marker.
 import { prisma } from "../lib/prisma.js";
+import { guardJobRequest } from "../lib/cronAuth.js";
 
 const RETENTION_DAYS = 7;
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    res.setHeader("Allow", "POST");
-    res.status(405).end();
-    return;
-  }
-
-  const expected = process.env.PURGE_JOB_SECRET;
-  const provided = req.headers["x-purge-job-secret"];
-  if (!expected || provided !== expected) {
-    res.status(401).json({ ok: false, error: "unauthorized" });
-    return;
-  }
+  if (!guardJobRequest(req, res)) return;
 
   const cutoff = new Date(Date.now() - RETENTION_DAYS * 24 * 60 * 60 * 1000);
 
   try {
-    const result = await prisma.contact.deleteMany({
+    const unconfirmed = await prisma.contact.deleteMany({
       where: {
         consentConfirmedAt: null,
         createdAt: { lt: cutoff },
       },
     });
-    res.status(200).json({ ok: true, deleted: result.count });
+
+    // Separate deleteMany rather than an OR in the query above: an erasure
+    // request is unconditional (no age cutoff, confirmed or not), and keeping
+    // the two counts distinct makes the cron log say which kind of deletion
+    // happened on a given night.
+    const erasures = await prisma.contact.deleteMany({
+      where: { markedForDeletionAt: { not: null } },
+    });
+
+    const result = {
+      ok: true,
+      deletedUnconfirmed: unconfirmed.count,
+      deletedErasureRequests: erasures.count,
+    };
+    console.log("[api/purge-unconfirmed]", JSON.stringify(result));
+    res.status(200).json(result);
   } catch (err) {
     console.error("[api/purge-unconfirmed] error", err);
     res.status(500).json({ ok: false, error: "internal_error" });

@@ -13,7 +13,11 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:migrate:deploy": "prisma migrate deploy",
     "prisma:studio": "prisma studio",
-    "contacts:approved": "node scripts/list-approved-contacts.mjs",
+    "contacts:approved": "node --env-file=.env scripts/list-approved-contacts.mjs",
+    "contacts:feedback": "node --env-file=.env scripts/list-feedback-contacts.mjs",
+    "contacts:erase": "node --env-file=.env scripts/mark-for-erasure.mjs",
+    "access:revoke": "node --env-file=.env scripts/revoke-access.mjs",
+    "access:reissue": "node --env-file=.env scripts/reissue-access.mjs",
     "skill:sync": "node --env-file=.env scripts/sync-skill-package.mjs",
     "env:check": "node --env-file=.env scripts/check-env-shape.mjs"
   },

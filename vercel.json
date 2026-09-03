@@ -1,4 +1,5 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
     { "source": "/access/:token", "destination": "/api/access?t=:token" }
   ],
@@ -6,5 +7,9 @@
     "api/access.js": {
       "includeFiles": "install.html"
     }
-  }
+  },
+  "crons": [
+    { "path": "/api/purge-unconfirmed", "schedule": "0 3 * * *" },
+    { "path": "/api/purge-access-logs", "schedule": "0 4 * * *" }
+  ]
 }

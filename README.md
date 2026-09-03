@@ -73,8 +73,8 @@ The waitlist form (`#signup` in `index.html`) posts to small Vercel serverless
 functions in `api/`, backed by a dedicated Supabase Postgres project via Prisma
 (`prisma/schema.prisma`) — not the `change-agent-app` database. Double opt-in signup
 through install-access-email issuance through the gated install page and token-gated
-package downloads are all built; Phase 4 (troubleshooting/ops polish beyond what's
-already in `install.html`, revoke tooling, scheduled purge jobs) is not.
+package downloads are all built, as is Phase 4 (scheduled purge jobs, revoke/erasure/
+re-issue tooling, the feedback-consent export — see "Ops runbook" below).
 
 - `api/signup.js` — validates + rate-limits (5/hour per IP and per email), upserts a
   `Contact`, and emails a 30-minute signed confirm link via Resend.
@@ -101,12 +101,17 @@ already in `install.html`, revoke tooling, scheduled purge jobs) is not.
 - `access-expired.html` — FR-5.5, plain on-brand page for an invalid/expired/revoked
   access token (no self-service resend, unlike `confirm-expired.html` — just a support
   contact).
-- `api/purge-unconfirmed.js` — deletes unconfirmed signups older than 7 days (FR-2.4).
-  **Not yet scheduled** — see the comment at the top of that file for how to wire up a
-  Vercel Cron trigger once this is ready to run automatically.
+- `api/purge-unconfirmed.js` — deletes unconfirmed signups older than 7 days (FR-2.4)
+  and contacts marked for erasure (GDPR-4). Runs nightly at **03:00 UTC** via the
+  `crons` array in `vercel.json`.
 - `api/purge-access-logs.js` — deletes `AccessLog` rows older than 90 days (spec
   retention: "90 days rolling, then aggregate-only" — the surviving aggregate is
-  `Token.usedAt`/`useCount`, never purged). **Not yet scheduled**, same as above.
+  `Token.usedAt`/`useCount`, never purged). Runs nightly at **04:00 UTC**, an hour
+  behind the contact purge so cascaded deletes settle first.
+- `lib/cronAuth.js` — shared authorization for both purge jobs. Vercel Cron sends an
+  HTTP **GET** with `Authorization: Bearer $CRON_SECRET`; a human can trigger a run on
+  demand with **POST** + `x-purge-job-secret: $PURGE_JOB_SECRET`. Either credential is
+  accepted; if neither secret is configured, nothing is authorized.
 - `robots.txt` — disallows the `/access` path prefix (FR-5.4); `install.html` and
   `access-expired.html` also carry their own `noindex,nofollow` meta tag.
 - `privacy/index.html` — the privacy notice the consent checkbox links to.
@@ -114,6 +119,9 @@ already in `install.html`, revoke tooling, scheduled purge jobs) is not.
   queryable list of confirmed/approved contacts. No UI at this scale.
 - `scripts/sync-skill-package.mjs` (`npm run skill:sync`) — manual, not scheduled;
   see "Package storage" below.
+- `scripts/revoke-access.mjs`, `scripts/reissue-access.mjs`,
+  `scripts/mark-for-erasure.mjs`, `scripts/list-feedback-contacts.mjs` — see
+  "Ops runbook" below.
 
 **Setup required before this works in any environment:**
 
@@ -135,6 +143,11 @@ already in `install.html`, revoke tooling, scheduled purge jobs) is not.
    production. It also runs automatically on every cold start via `lib/prisma.js`, but
    catching it here is faster than waiting for a deploy to fail.
 6. Set up package storage (below) before `/access/:token` can serve real downloads.
+7. Set `CRON_SECRET` in Vercel (Production) to a long random value — **the scheduled
+   purge jobs do not run without it.** It's an ordinary env var you create yourself;
+   Vercel does not populate it, it just forwards whatever you set as the
+   `Authorization: Bearer` header on each scheduled invocation. `PURGE_JOB_SECRET` is
+   separate and only needed for triggering a purge by hand.
 
 ### Package storage (Phase 3, FR-5.2/5.3)
 
@@ -159,6 +172,51 @@ trivially fetchable and defeat the whole point of gating downloads.
    to deliberately adopt a new upstream release — this is a manual, not-scheduled step
    on purpose, so already-emailed 90-day access links never silently change what they
    serve underneath a recipient.
+
+## Ops runbook (Phase 4)
+
+Every script below loads `.env` via `node --env-file=.env` in its `package.json` entry
+and talks to the same database as production. There is no staging database — `--dry-run`
+first is not paranoia, it's the only rehearsal available.
+
+| Situation | Command |
+|---|---|
+| Someone shared their install link / an address is abusing access | `npm run access:revoke -- --email <address>` |
+| Kill one specific token | `npm run access:revoke -- --token-id <id>` |
+| Kill **every** outstanding install link | `npm run access:revoke -- --all` |
+| "My link expired / I lost the email" | `npm run access:reissue -- --email <address>` |
+| Erasure request (GDPR-4/9) | `npm run contacts:erase -- --email <address>` |
+| Erasure, delete today rather than tonight | `npm run contacts:erase -- --email <address> --now` |
+| Who has install access | `npm run contacts:approved` |
+| Who consented to feedback outreach (Q8) | `npm run contacts:feedback` (`-- --csv` to pipe to a file) |
+| Run a purge now instead of waiting for 03:00 UTC | `curl -X POST -H "x-purge-job-secret: $PURGE_JOB_SECRET" https://speaksustainability.org/api/purge-unconfirmed` |
+
+**Revoke vs. rotating `CONFIRM_TOKEN_SECRET`.** Both kill every outstanding link, and
+they are not interchangeable:
+
+- `access:revoke --all` is the normal answer. It writes `Token.revokedAt` per token —
+  auditable, effective on the next request, no redeploy, and it leaves in-flight
+  30-minute confirm links alone so people mid-signup aren't stranded.
+- Rotating `CONFIRM_TOKEN_SECRET` in Vercel is the **break-glass** for the different
+  case where the signing secret itself leaked and no signature can be trusted any more.
+  It invalidates confirm *and* access tokens instantly and needs a redeploy. Afterwards,
+  every confirmed contact needs `npm run access:reissue` individually — there is no bulk
+  re-issue, deliberately, because a bulk re-send is a mass email and should be a
+  considered act.
+
+**Key versioning is deliberately not built.** A `kid` in the token payload plus multiple
+accepted secrets would let the signing key rotate *without* invalidating live links.
+That solves routine rotation hygiene (SEC-1's "rotated periodically"), not compromise —
+in a leak, invalidating everything is the goal, not the problem. At pilot scale with
+90-day tokens it isn't worth the machinery, and deferring costs nothing later:
+`lib/tokens.js` can treat a payload with no `kid` as key v1, so tokens already in the
+wild keep verifying when versioning does arrive.
+
+**Not covered here:** there is no monitoring or alerting on the Supabase dependency.
+Two transient DB failures during Phase 3 (a pooler hang, and an IPv6-reachability gap to
+the direct host from Vercel's network) were both infrastructure, not code — but nothing
+currently notices if either recurs, including a purge job silently failing, since Vercel
+never retries a failed cron. Explicitly out of scope for Phase 4; revisit if it recurs.
 
 ## Assets
 
