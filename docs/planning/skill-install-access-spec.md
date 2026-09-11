@@ -115,11 +115,20 @@ Plus one line on what "it worked" looks like.
 
 **6.5 — Troubleshooting & contact (new, not in original wireframe):** Accordion (reuse existing accordion component) of 3–5 likely failure modes per client. Direct contact line: **`bschauer@rare.org`** for alpha (Decided, Q5) — swap to a team mailbox/ticket tool before Climate Week. A visible line on the access link's 90-day expiry/renewal path.
 
-### Email/sender naming (Decided, Q9)
+### Email/sender naming (Decided, Q9 — updated 2026-09-11, rename complete)
 
-Every email's **display name** is `"Speak Sustainability"` (the pilot brand the recipient recognizes from signup). **Subject lines** name the specific skill, `"Climate Comms Review"` (what the recipient needs to match against their LLM client's own Skills UI after installing).
+Every email's **display name** is `"Speak Sustainability"` (the pilot brand the recipient recognizes from signup). **Subject lines** also use `"Speak Sustainability"` now — the sender/subject split this section originally described has collapsed, per the watch item below, now that the skill itself carries that name.
 
-> **Watch item:** Rare may rename the skill from "Climate Comms Review" to "Speak Sustainability" later if the current name hurts usage/findability. If that happens, this sender/subject split collapses — apply the rename as a full pass across subject lines, the install page's path-selection header, platform-tab content, and `.zip`/repo names together, not piecemeal.
+**The skill was renamed 2026-09-11** (repo transferred and renamed to `Rare-Technology/speak-sustainability-skill`, release `v1.1.0`). One fact this surfaced that wasn't known when Q9 was first decided: **the displayed name is not the same across clients**. The Agent Skills spec requires the manifest `name` field to be a lowercase-hyphenated slug matching the directory name — it can't literally be "Speak Sustainability" everywhere:
+
+| Client | What actually appears in the Skills list |
+|---|---|
+| ChatGPT | `Speak Sustainability` — the only client with a separate display-name field (`agents/openai.yaml`) |
+| Claude, Gemini | `speak-sustainability` — the raw slug |
+
+`install.html`'s path-selection note (§6.1) states this per-client distinction explicitly, since that's the one surface where literal accuracy against each client's own UI matters. Email subject lines use the human-readable "Speak Sustainability" regardless of client — that's prose, not a literal match instruction, so the slug-casing distinction doesn't apply there.
+
+> **Watch item — resolved.** The rename from "Climate Comms Review" to "Speak Sustainability" is complete: `SKILL.md`, `agents/openai.yaml`, the repo/folder path, and the two `.zip` release asset filenames were all renamed together upstream (by Erik Thulin), and this site's install page, CLI install command, and email copy (`install.html`, `lib/email.js`, `lib/skillPackage.js`, `scripts/sync-skill-package.mjs`, `confirmed.html`, `privacy/index.html`) were updated in the same pass, per this section's original instruction not to do it piecemeal.
 
 ## Data model
 
@@ -232,7 +241,7 @@ All three emails: **From** display name `"Speak Sustainability"` (Decided, Q9).
 6. **Role/org required?** No — optional.
 7. **Block crawlers?** Yes, basic blocking for now (`noindex` + `robots.txt`). Revisit post-launch if AI-discoverability becomes a goal — that's a distinct research question (e.g. `llms.txt`, a skill registry), not solved by just unblocking crawlers.
 8. **Email for feedback/input, not just access/updates?** Yes — via a second, separate, optional consent checkbox (FR-1.7), independently withdrawable (GDPR-8). Explicitly not testimonials/public quotes.
-9. **Sender name vs. subject line naming?** Sender display name = "Speak Sustainability" (brand); subject lines = "Climate Comms Review" (the skill's actual name, matching what appears in the recipient's LLM client). Watch item: revisit fully if the skill itself is renamed later.
+9. **Sender name vs. subject line naming?** Originally: sender display name = "Speak Sustainability" (brand), subject lines = "Climate Comms Review" (the skill's actual name). **Updated 2026-09-11:** the skill was renamed to match the brand, so both now use "Speak Sustainability" — see the full writeup under "Email/sender naming" above, including the per-client display-name nuance (ChatGPT shows the display name; Claude/Gemini show the lowercase slug) that surfaced during the rename.
 
 ## Implementation phases
 

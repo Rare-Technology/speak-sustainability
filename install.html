@@ -203,10 +203,10 @@
       <h1 class="section-heading">Install: Speak Sustainability</h1>
       <p class="lead">Choose your primary method of use.</p>
       <p class="note">
-        Currently appears as <strong>Climate Comms Review</strong> in your client's Skills
-        list and in the downloaded package's file names — we're renaming it to Speak
-        Sustainability soon, so the instructions below still refer to that name where it
-        has to match what you'll actually see.
+        Appears as <strong>Speak Sustainability</strong> in ChatGPT's Skills list. In
+        Claude and Gemini, it shows as the lowercase <code>speak-sustainability</code> —
+        that's expected, not a typo; only ChatGPT supports a separate display name. The
+        steps below use whichever name each client actually shows.
       </p>
 
       <div class="path-grid">
@@ -255,7 +255,7 @@
             <li>In the ChatGPT sidebar, select <strong>Plugins</strong>.</li>
             <li>Open the <strong>Skills</strong> tab.</li>
             <li>Select <strong>Create</strong>, then <strong>Upload from your computer</strong>.</li>
-            <li>Upload <code>climate-comms-review.zip</code>.</li>
+            <li>Upload <code>speak-sustainability.zip</code>.</li>
           </ol>
         </div>
         <div class="tabpanel" role="tabpanel" id="panel-claude" aria-labelledby="tab-claude" tabindex="0" hidden>
@@ -263,14 +263,14 @@
             <li>Make sure <strong>Code execution and file creation</strong> is enabled in <strong>Settings → Capabilities</strong>.</li>
             <li>Open <strong>Customize → Skills</strong>.</li>
             <li>Select <strong>+</strong>, then <strong>Create skill → Upload a skill</strong>.</li>
-            <li>Upload <code>climate-comms-review-claude.zip</code> and make sure the skill is enabled.</li>
+            <li>Upload <code>speak-sustainability-claude.zip</code> and make sure the skill is enabled.</li>
           </ol>
         </div>
         <div class="tabpanel" role="tabpanel" id="panel-gemini-spark" aria-labelledby="tab-gemini-spark" tabindex="0" hidden>
           <ol>
             <li>Open <a href="https://gemini.google.com">Gemini</a> or the Gemini app on Mac.</li>
             <li>Select <strong>Switch to Spark → Skills</strong>.</li>
-            <li>Select <strong>Upload</strong> and choose <code>climate-comms-review.zip</code>.</li>
+            <li>Select <strong>Upload</strong> and choose <code>speak-sustainability.zip</code>.</li>
             <li>Review the skill, then select <strong>Create</strong>.</li>
           </ol>
         </div>
@@ -278,7 +278,7 @@
           <ol>
             <li>In the Gemini Enterprise navigation menu, select <strong>Skills</strong>.</li>
             <li>Select <strong>Import</strong>.</li>
-            <li>Upload <code>climate-comms-review.zip</code>, then select <strong>Import</strong>.</li>
+            <li>Upload <code>speak-sustainability.zip</code>, then select <strong>Import</strong>.</li>
           </ol>
         </div>
       </div>
@@ -301,7 +301,7 @@
             <span data-label>Copy</span>
           </button>
         </div>
-        <pre><code id="cli-command">npx skills add https://github.com/ethulin/climate-comms-review/tree/main/skill/climate-comms-review --global</code></pre>
+        <pre><code id="cli-command">npx skills add https://github.com/Rare-Technology/speak-sustainability-skill/tree/main/skill/speak-sustainability --global</code></pre>
       </div>
       <p class="note">The installer prompts you to choose an available agent. Omit <code>--global</code> for a project-only installation.</p>
     </div>

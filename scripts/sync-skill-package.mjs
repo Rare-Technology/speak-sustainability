@@ -2,20 +2,20 @@
 // One-off, manually-run sync of the skill's release packages into private
 // Vercel Blob storage. Not scheduled and not run in CI — see
 // docs/planning/skill-install-access-spec.md's Phase 3 "Package storage"
-// section and lib/skillPackage.js for why: the upstream ethulin/climate-
-// comms-review repo is private, and this site's own repo is public, so
-// committing the zips here would make them trivially fetchable (defeats
-// FR-5.2). Run this whenever you want to deliberately adopt a new upstream
-// release — already-emailed 90-day access links keep serving whatever was
-// last synced here until you run this again.
+// section and lib/skillPackage.js for why: the upstream skill repo is
+// private, and this site's own repo is public, so committing the zips here
+// would make them trivially fetchable (defeats FR-5.2). Run this whenever
+// you want to deliberately adopt a new upstream release — already-emailed
+// 90-day access links keep serving whatever was last synced here until you
+// run this again.
 //
 // Requires:
 //   - BLOB_READ_WRITE_TOKEN in the environment (same var the deployed app
 //     uses — `vercel env pull .env` or export it manually).
 //   - The `gh` CLI, authenticated with read access to the private
-//     ethulin/climate-comms-review repo (gh auth status to check).
+//     Rare-Technology/speak-sustainability-skill repo (gh auth status to check).
 //
-//   RELEASE_TAG=v1.0.0 node scripts/sync-skill-package.mjs
+//   RELEASE_TAG=v1.1.0 node scripts/sync-skill-package.mjs
 import { execFileSync } from "node:child_process";
 import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -23,8 +23,10 @@ import path from "node:path";
 import { put } from "@vercel/blob";
 import { SKILL_PACKAGES } from "../lib/skillPackage.js";
 
-const REPO = "ethulin/climate-comms-review";
-const RELEASE_TAG = process.env.RELEASE_TAG || "v1.0.0";
+// Renamed & transferred 2026-09-11 (was ethulin/climate-comms-review) —
+// see docs/planning/skill-install-access-spec.md's Q9 watch item.
+const REPO = "Rare-Technology/speak-sustainability-skill";
+const RELEASE_TAG = process.env.RELEASE_TAG || "v1.1.0";
 
 if (!process.env.BLOB_READ_WRITE_TOKEN) {
   console.error(
