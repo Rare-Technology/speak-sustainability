@@ -94,13 +94,23 @@
      Active tab: action-primary underline + text. Inactive: text-muted.
      --------------------------------------------------------- */
   .tabs{margin-top:var(--rare-space-9)}
-  .tablist{display:flex;flex-wrap:wrap;gap:var(--rare-space-2);border-bottom:var(--rare-border-width-default) solid var(--rare-color-border-default)}
+  /* Four tabs don't fit at phone width — scroll horizontally rather than
+     wrap (wrapping orphaned "Gemini Enterprise" onto its own line, with the
+     active-tab underline misaligned across the wrap). Same overflow-x
+     pattern as index.html's Use Cases carousel for small breakpoints. */
+  .tablist{
+    display:flex;flex-wrap:nowrap;gap:var(--rare-space-2);
+    border-bottom:var(--rare-border-width-default) solid var(--rare-color-border-default);
+    overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+  }
+  .tablist::-webkit-scrollbar{display:none}
   .tab{
-    background:none;border:none;cursor:pointer;
+    background:none;border:none;cursor:pointer;flex:0 0 auto;
     font-family:var(--rare-font-family-text);font-weight:var(--rare-font-weight-semibold);font-size:var(--rare-font-size-300);
     color:var(--rare-color-text-muted);
     padding:var(--rare-space-3) var(--rare-space-4);
     border-bottom:2px solid transparent;margin-bottom:-1px;
+    white-space:nowrap;
     transition:color var(--rare-motion-duration-fast) var(--rare-motion-easing-standard),
                border-color var(--rare-motion-duration-fast) var(--rare-motion-easing-standard);
   }
@@ -293,6 +303,12 @@
         <h2 class="section-heading">Use with Command-Line Agents</h2>
         <p class="lead">Claude Code, Codex, Gemini CLI, Cursor, or another supported agent.</p>
       </div>
+
+      <p class="note">
+        Requires a desktop or laptop with Node.js installed — this path won't
+        work from a phone or tablet. On mobile, use
+        <a href="#path-a">Web/Desktop LLM Clients</a> instead.
+      </p>
 
       <div class="terminal">
         <div class="terminal-bar">
