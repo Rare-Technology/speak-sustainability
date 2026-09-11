@@ -3,6 +3,17 @@
   "rewrites": [
     { "source": "/access/:token", "destination": "/api/access?t=:token" }
   ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=63072000; includeSubDomains; preload"
+        }
+      ]
+    }
+  ],
   "functions": {
     "api/access.js": {
       "includeFiles": "install.html"
