@@ -162,6 +162,9 @@
   .verify-box .copy-btn[data-copied="true"]{border-color:var(--rare-color-lime-700);color:var(--rare-color-lime-700)}
   .verify-box pre{padding:var(--rare-space-5);overflow-x:auto}
   .verify-box code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;font-size:var(--rare-font-size-300);color:var(--rare-color-text-default);white-space:pre-wrap;word-break:break-word}
+  .verify-checks{margin-top:var(--rare-space-3);padding-left:var(--rare-space-6);display:flex;flex-direction:column;gap:var(--rare-space-3)}
+  .verify-checks li{color:var(--rare-color-text-default);font-size:var(--rare-font-size-300)}
+  .next-link{display:inline-block;margin-top:var(--rare-space-4);font-size:var(--rare-font-size-300);font-weight:var(--rare-font-weight-semibold)}
 
   /* ---------------------------------------------------------
      6.5 Troubleshooting accordion — copied verbatim (markup/CSS/JS)
@@ -267,6 +270,7 @@
             <li>Select <strong>Create</strong>, then <strong>Upload from your computer</strong>.</li>
             <li>Upload <code>speak-sustainability.zip</code>.</li>
           </ol>
+          <a class="next-link" href="#verify">Next: verify it worked ↓</a>
         </div>
         <div class="tabpanel" role="tabpanel" id="panel-claude" aria-labelledby="tab-claude" tabindex="0" hidden>
           <ol>
@@ -275,6 +279,7 @@
             <li>Select <strong>+</strong>, then <strong>Create skill → Upload a skill</strong>.</li>
             <li>Upload <code>speak-sustainability-claude.zip</code> and make sure the skill is enabled.</li>
           </ol>
+          <a class="next-link" href="#verify">Next: verify it worked ↓</a>
         </div>
         <div class="tabpanel" role="tabpanel" id="panel-gemini-spark" aria-labelledby="tab-gemini-spark" tabindex="0" hidden>
           <ol>
@@ -283,6 +288,7 @@
             <li>Select <strong>Upload</strong> and choose <code>speak-sustainability.zip</code>.</li>
             <li>Review the skill, then select <strong>Create</strong>.</li>
           </ol>
+          <a class="next-link" href="#verify">Next: verify it worked ↓</a>
         </div>
         <div class="tabpanel" role="tabpanel" id="panel-gemini-ent" aria-labelledby="tab-gemini-ent" tabindex="0" hidden>
           <ol>
@@ -290,6 +296,7 @@
             <li>Select <strong>Import</strong>.</li>
             <li>Upload <code>speak-sustainability.zip</code>, then select <strong>Import</strong>.</li>
           </ol>
+          <a class="next-link" href="#verify">Next: verify it worked ↓</a>
         </div>
       </div>
     </div>
@@ -320,17 +327,20 @@
         <pre><code id="cli-command">npx skills add https://github.com/Rare-Technology/speak-sustainability-skill/tree/main/skill/speak-sustainability --global</code></pre>
       </div>
       <p class="note">The installer prompts you to choose an available agent. Omit <code>--global</code> for a project-only installation.</p>
+      <a class="next-link" href="#verify">Next: verify it worked ↓</a>
     </div>
   </section>
 
   <!-- ============================ 6.4 VERIFICATION ============================ -->
-  <section class="section">
+  <section class="section" id="verify">
     <div class="container">
       <div class="section-head">
         <p class="eyebrow">Verification</p>
         <h2 class="section-heading">Verify installation</h2>
-        <p class="lead">Works the same way for either path — paste in existing copy and ask for a review, right inside your client.</p>
+        <p class="lead">Works the same way for either path — right inside your client, not here.</p>
       </div>
+
+      <p class="note"><strong>Start a new chat first</strong> — a chat that was already open before you installed may not pick up the skill.</p>
 
       <div class="verify-box">
         <div class="terminal-bar">
@@ -341,9 +351,15 @@
         </div>
         <pre><code id="verify-prompt">Review this:
 
-[paste the copy here]</code></pre>
+Our organization is committed to achieving net-zero emissions by 2050 through ambitious decarbonization strategies and nature-based solutions. The climate crisis is an existential threat, and if we don't act now, it will be too late. Join us in making a difference for the planet.</code></pre>
       </div>
-      <p class="note">If it worked, you'll get back a short, structured review — how the piece reads, what's already working, and what to change — grounded in your own wording, not a generic checklist.</p>
+      <p class="note">Have your own copy handy? Paste that in instead of the example above — either way, ask for a review the same way.</p>
+
+      <p class="note" style="margin-top:var(--rare-space-6)"><strong>Confirm it actually ran</strong> — look for both of these:</p>
+      <ul class="verify-checks">
+        <li><strong>While it works:</strong> a short activity step showing it's using the Speak Sustainability skill (exact wording varies by client).</li>
+        <li><strong>In the answer:</strong> a short review in three parts — how the piece reads, what's already working, what to change — quoting your actual wording back (e.g. "net-zero," "existential threat") rather than generic writing tips.</li>
+      </ul>
     </div>
   </section>
 
