@@ -2,7 +2,7 @@
    LEVEL UP — workshop survey (/level-up/) + resources
    (/level-up/resources/) for the Climate Week NYC 2026 workshop.
 
-   Same Rare tokens, fonts, nav and footer as index.html. The workshop
+   Same Rare tokens, fonts and footer as index.html. The workshop
    deck's look is carried by two local additions, not new tokens —
    they're event-specific and shouldn't leak into the main site:
      --lu-navy      deck background (sampled from the TCC navy logo)
@@ -34,16 +34,6 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
   outline-offset:var(--rare-border-offset-focus);border-radius:var(--rare-radius-sm);
 }
 .visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
-
-/* --- Nav (same lockup as index.html) --- */
-.nav-inner{display:flex;align-items:center;justify-content:space-between;gap:var(--rare-space-4);padding-block:var(--rare-space-6)}
-.nav-brand{display:inline-flex;align-items:center;gap:var(--rare-space-3)}
-.nav-logo{display:inline-flex}
-.nav-logo img{height:26px;width:auto}
-.nav-by{font-weight:var(--rare-font-weight-semibold);font-size:var(--rare-font-size-300);color:var(--rare-color-text-muted);white-space:nowrap}
-.nav-by a{color:inherit;text-decoration:none}
-.nav-by a:hover,.nav-by a:focus-visible{text-decoration:underline}
-@media (max-width:639px){.nav-logo img{height:22px}}
 
 /* --- Hero: the deck's navy speech bubble ---
    A navy panel with a tail at the bottom-left (the deck's title-slide bubble). */
@@ -101,4 +91,4 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 .footer{margin-top:auto;border-top:var(--rare-border-width-default) solid var(--rare-color-border-default);padding-block:var(--rare-space-6)}
 .footer-legal{display:flex;flex-wrap:wrap;gap:var(--rare-space-2) var(--rare-space-6);justify-content:space-between;color:var(--rare-color-text-muted);font-size:var(--rare-font-size-200)}
 .footer-legal a{color:inherit;text-decoration:underline}
-main{padding-bottom:var(--rare-space-10)}
+main{padding-block:var(--rare-space-7) var(--rare-space-10)}
