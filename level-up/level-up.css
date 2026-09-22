@@ -3,11 +3,10 @@
    (/level-up/resources/) for the Climate Week NYC 2026 workshop.
 
    Same Rare tokens, fonts, nav and footer as index.html. The workshop
-   deck's look is carried by three local additions, not new tokens —
+   deck's look is carried by two local additions, not new tokens —
    they're event-specific and shouldn't leak into the main site:
      --lu-navy      deck background (sampled from the TCC navy logo)
      --lu-lavender  deck subtitle ink on navy
-     --lu-tile-*    the eight pastel "principle" tiles from the deck
    Orange reuses --rare-color-orange-500 (within a few points of the deck's).
 
    Every path in the HTML is root-relative: these pages live one and two
@@ -17,14 +16,6 @@
   --lu-navy:#1c2d5b;
   --lu-navy-soft:#4b5e98;              /* deck's secondary bubble blue */
   --lu-lavender:#c9d0ea;
-  --lu-tile-personal:#c8e3c8;
-  --lu-tile-accessible:#efc5c5;
-  --lu-tile-empowering:#fdefc8;
-  --lu-tile-doable:#e3f1d0;
-  --lu-tile-collective:#d5eff6;
-  --lu-tile-normal:#cdd3ef;
-  --lu-tile-trustworthy:#fde0c8;
-  --lu-tile-everyone:#d9dbe1;
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
@@ -55,8 +46,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 @media (max-width:639px){.nav-logo img{height:22px}}
 
 /* --- Hero: the deck's navy speech bubble ---
-   A navy panel with a tail at the bottom-left (the deck's title-slide bubble),
-   capped by a strip of the eight pastel principle tiles. */
+   A navy panel with a tail at the bottom-left (the deck's title-slide bubble). */
 .lu-hero{
   --pad:clamp(var(--rare-space-6), 5vw, var(--rare-space-9));
   position:relative;background:var(--lu-navy);color:var(--rare-color-text-on-brand);
@@ -68,15 +58,6 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
   width:44px;height:44px;background:var(--lu-navy);
   clip-path:polygon(0 0, 100% 0, 18% 100%);
 }
-.lu-tiles{display:grid;grid-template-columns:repeat(8,1fr);height:12px;border-radius:var(--rare-radius-xl) var(--rare-radius-xl) 0 0;overflow:hidden}
-.lu-tiles span:nth-child(1){background:var(--lu-tile-personal)}
-.lu-tiles span:nth-child(2){background:var(--lu-tile-accessible)}
-.lu-tiles span:nth-child(3){background:var(--lu-tile-empowering)}
-.lu-tiles span:nth-child(4){background:var(--lu-tile-doable)}
-.lu-tiles span:nth-child(5){background:var(--lu-tile-collective)}
-.lu-tiles span:nth-child(6){background:var(--lu-tile-normal)}
-.lu-tiles span:nth-child(7){background:var(--lu-tile-trustworthy)}
-.lu-tiles span:nth-child(8){background:var(--lu-tile-everyone)}
 .lu-hero-body{padding:var(--pad)}
 .lu-eyebrow{
   font-family:var(--rare-font-family-display);font-weight:var(--rare-font-weight-bold);
