@@ -154,3 +154,22 @@ model SignupAttempt {
   @@index([emailAttempted, createdAt])
   @@index([ipHash, createdAt])
 }
+
+// Post-workshop feedback survey (/level-up — Level Up workshop, Climate Week
+// NYC 2026). Anonymous by default: name is optional and there is no email or
+// link to Contact. Exported to CSV for Google Sheets via
+// `npm run survey:export`. `event` tags the workshop so the same table can
+// hold a future session's responses.
+model WorkshopSurveyResponse {
+  id               String   @id @default(cuid())
+  event            String
+  biggestObstacle  String?
+  likelihood       Int? // 1 (very unlikely) – 5 (very likely)
+  supportRequest   String?
+  name             String?
+  ipHash           String? // salted hash only (lib/hash.js) — used for the per-IP rate limit
+  createdAt        DateTime @default(now())
+
+  @@index([event, createdAt])
+  @@index([ipHash, createdAt])
+}

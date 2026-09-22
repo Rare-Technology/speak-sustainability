@@ -19,7 +19,8 @@
     "access:revoke": "node --env-file=.env scripts/revoke-access.mjs",
     "access:reissue": "node --env-file=.env scripts/reissue-access.mjs",
     "skill:sync": "node --env-file=.env scripts/sync-skill-package.mjs",
-    "env:check": "node --env-file=.env scripts/check-env-shape.mjs"
+    "env:check": "node --env-file=.env scripts/check-env-shape.mjs",
+    "survey:export": "node --env-file=.env scripts/export-workshop-survey.mjs"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",

@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Level Up workshop resources — Speak Sustainability</title>
+<meta name="description" content="Resources from Level Up, a climate communication workshop for corporate sustainability leaders at Climate Week NYC 2026, from the Talking Climate Collaborative and Rare." />
+<meta name="robots" content="noindex,nofollow" />
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+<link rel="preload" href="/assets/fonts/source-sans-3-var-latin.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="stylesheet" href="/assets/fonts/fonts.css" />
+<link rel="stylesheet" href="/design-tokens/build/rare-tokens.css" />
+<link rel="stylesheet" href="/level-up/level-up.css" />
+<style>
+  .thanks{
+    display:flex;gap:var(--rare-space-3);align-items:center;
+    margin-bottom:var(--rare-space-5);padding:var(--rare-space-3) var(--rare-space-4);
+    background:var(--rare-color-background-default);border:var(--rare-border-width-default) solid var(--rare-color-border-default);
+    border-radius:var(--rare-radius-md);font-size:var(--rare-font-size-300);font-weight:var(--rare-font-weight-semibold);
+  }
+  .thanks svg{flex:none;color:var(--rare-color-green-500)}
+  .thanks[hidden]{display:none}
+
+  .resources{display:grid;gap:var(--rare-space-5)}
+  .resource{display:grid;gap:var(--rare-space-5)}
+  @media (min-width:720px){.resource{grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);align-items:center;gap:var(--rare-space-7)}}
+  .resource-kicker{
+    font-family:var(--rare-font-family-display);font-weight:var(--rare-font-weight-bold);
+    text-transform:uppercase;letter-spacing:.04em;font-size:var(--rare-font-size-200);
+    color:var(--rare-color-text-muted);margin-bottom:var(--rare-space-2);
+  }
+  .resource p.desc{color:var(--rare-color-text-default);font-size:var(--rare-font-size-300);margin-block:var(--rare-space-3) var(--rare-space-5)}
+
+  /* Principles visual — the deck's 4×2 pastel grid */
+  .principles{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;list-style:none}
+  @media (min-width:720px){.principles{grid-template-columns:repeat(2,1fr)}}
+  .principles li{
+    min-width:0;min-height:64px;display:flex;align-items:flex-end;padding:var(--rare-space-2);
+    font-family:var(--rare-font-family-display);font-weight:var(--rare-font-weight-bold);
+    font-size:var(--rare-font-size-200);line-height:1.1;color:var(--lu-navy);border-radius:var(--rare-radius-sm);
+    overflow-wrap:break-word;hyphens:auto;
+  }
+  @media (max-width:419px){.principles{gap:4px}.principles li{font-size:.75rem;padding:6px 5px}}
+  .principles li:nth-child(1){background:var(--lu-tile-personal)}
+  .principles li:nth-child(2){background:var(--lu-tile-accessible)}
+  .principles li:nth-child(3){background:var(--lu-tile-empowering)}
+  .principles li:nth-child(4){background:var(--lu-tile-doable)}
+  .principles li:nth-child(5){background:var(--lu-tile-collective)}
+  .principles li:nth-child(6){background:var(--lu-tile-normal)}
+  .principles li:nth-child(7){background:var(--lu-tile-trustworthy)}
+  .principles li:nth-child(8){background:var(--lu-tile-everyone)}
+
+  /* Speak Sustainability visual — the site's green brand panel with a chat bubble */
+  .ss-visual{
+    background:var(--rare-color-surface-brand);border-radius:var(--rare-radius-lg);
+    padding:var(--rare-space-5);display:grid;gap:var(--rare-space-3);align-content:center;min-height:100%;
+  }
+  .ss-visual img{height:22px;width:auto;filter:brightness(0) invert(1)}
+  .ss-bubble{
+    background:var(--rare-color-surface-chat-user);color:var(--rare-color-text-default);
+    border-radius:var(--rare-radius-md) var(--rare-radius-md) var(--rare-radius-md) 2px;
+    padding:var(--rare-space-3);font-size:var(--rare-font-size-200);line-height:1.35;
+  }
+  .ss-bubble--agent{background:var(--rare-color-surface-chat-agent);border-radius:var(--rare-radius-md) var(--rare-radius-md) 2px var(--rare-radius-md);margin-left:var(--rare-space-6)}
+
+  .share{
+    margin-top:var(--rare-space-5);padding:var(--rare-space-5) var(--rare-space-6);
+    background:var(--rare-color-orange-500);color:var(--lu-navy);border-radius:var(--rare-radius-card);
+    font-family:var(--rare-font-family-display);font-weight:var(--rare-font-weight-bold);
+    font-size:var(--rare-font-size-500);line-height:1.25;
+  }
+
+  .partners{margin-top:var(--rare-space-9);text-align:center}
+  .partners-label{font-size:var(--rare-font-size-200);color:var(--rare-color-text-muted);margin-bottom:var(--rare-space-4)}
+  .partners-logos{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:var(--rare-space-6) var(--rare-space-9)}
+  .partners-logos a{display:inline-flex}
+  .partners-logos .tcc{height:60px;width:auto}
+  .partners-logos .rare{height:72px;width:auto}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <nav class="nav-inner" aria-label="Primary">
+      <div class="nav-brand">
+        <a class="nav-logo" href="/" aria-label="Speak Sustainability — home">
+          <img src="/assets/speak-sustainability-logo.svg" alt="Speak Sustainability" width="201" height="26" />
+        </a>
+        <span class="nav-by">by <a href="https://rare.org/">Rare</a></span>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <p class="thanks" id="thanks" role="status" hidden>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Thanks — your answers are in.
+    </p>
+
+    <section class="lu-hero" aria-labelledby="hero-heading">
+      <div class="lu-tiles" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+      <div class="lu-hero-body">
+        <p class="lu-eyebrow">Level Up · Climate Week NYC 2026</p>
+        <h1 class="lu-headline" id="hero-heading">Your workshop <em>resources</em></h1>
+        <p class="lu-sub">From <strong>Level Up: A Climate Communication Workshop for Corporate Sustainability Leaders</strong>. Here's everything you need to put today's principles to work.</p>
+      </div>
+    </section>
+
+    <div class="resources">
+      <article class="lu-card resource" aria-labelledby="principles-heading">
+        <ul class="principles" aria-label="The eight principles">
+          <li>Make it personal</li>
+          <li>Make it accessible</li>
+          <li>Make it empowering</li>
+          <li>Make it doable</li>
+          <li>Make it collective</li>
+          <li>Make it normal</li>
+          <li>Make it trustworthy</li>
+          <li>Make it for everyone</li>
+        </ul>
+        <div>
+          <p class="resource-kicker">Report · Rare</p>
+          <h2 class="lu-section-heading" id="principles-heading">Eight Principles for Effective and Inviting Climate Communication</h2>
+          <p class="desc">The research-backed framework we test-drove today. Rare's report explains each principle, the behavioral science behind it, and how to apply it so your climate messages meet people where they are.</p>
+          <a class="btn btn-primary" href="https://rare.org/research-reports/eight-principles-for-effective-and-inviting-climate-communication/" target="_blank" rel="noopener">Read the principles<span class="visually-hidden"> (opens in a new tab)</span></a>
+        </div>
+      </article>
+
+      <article class="lu-card resource" aria-labelledby="ss-heading">
+        <div class="ss-visual" aria-hidden="true">
+          <img src="/assets/speak-sustainability-logo.svg" alt="" width="201" height="26" />
+          <p class="ss-bubble">Here's a draft of our press release. Where could it be improved?</p>
+          <p class="ss-bubble ss-bubble--agent">All 8 principles checked. Three quick wins: lead with people, not the planet…</p>
+        </div>
+        <div>
+          <p class="resource-kicker">AI skill · Rare</p>
+          <h2 class="lu-section-heading" id="ss-heading">Speak Sustainability</h2>
+          <p class="desc">The AI tool from today's session. It's a science-backed skill for your organization's AI that reviews any climate or sustainability communication against the eight principles and suggests specific improvements. Sign up to join the pilot.</p>
+          <a class="btn btn-primary" href="https://speaksustainability.org/">Visit Speak Sustainability</a>
+        </div>
+      </article>
+    </div>
+
+    <p class="share">Share the principles and the AI skill with your team.</p>
+
+    <section class="partners" aria-labelledby="partners-heading">
+      <h2 class="partners-label" id="partners-heading">Brought to you by</h2>
+      <div class="partners-logos">
+        <img class="tcc" src="/assets/tcc-logo.webp" alt="Talking Climate Collaborative" width="720" height="228" />
+        <a href="https://rare.org/" aria-label="Rare"><img class="rare" src="/assets/rare-logo.svg" alt="Rare" width="160" height="216" /></a>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-legal">
+      <span>© 2026 Rare. All rights reserved.</span>
+      <a href="/privacy/">Privacy notice</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  if (new URLSearchParams(location.search).has("thanks")) {
+    document.getElementById("thanks").hidden = false;
+  }
+</script>
+</body>
+</html>

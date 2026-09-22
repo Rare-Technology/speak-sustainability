@@ -218,6 +218,16 @@ the direct host from Vercel's network) were both infrastructure, not code — bu
 currently notices if either recurs, including a purge job silently failing, since Vercel
 never retries a failed cron. Explicitly out of scope for Phase 4; revisit if it recurs.
 
+## Level Up workshop survey (Climate Week NYC 2026)
+
+- `/level-up/` is a four-question survey. Submitting it posts to `api/workshop-survey.js`
+  and redirects to `/level-up/resources/`. Both pages are `noindex` and share
+  `level-up/level-up.css`.
+- Responses go to the `WorkshopSurveyResponse` table (migration
+  `20260922120000_workshop_survey`). There's no email field. Name is optional.
+- Export for Google Sheets: `npm run survey:export > level-up-survey.csv`, then in Sheets
+  use File → Import → Upload.
+
 ## Assets
 
 - `assets/hero-woman-{340,680}.webp` — hero illustration, served responsively via

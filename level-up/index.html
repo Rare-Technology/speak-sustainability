@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Level Up workshop survey — Speak Sustainability</title>
+<meta name="description" content="A four-question survey for participants of Level Up, a climate communication workshop for corporate sustainability leaders at Climate Week NYC 2026." />
+<meta name="robots" content="noindex,nofollow" />
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+<link rel="preload" href="/assets/fonts/source-sans-3-var-latin.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="stylesheet" href="/assets/fonts/fonts.css" />
+<link rel="stylesheet" href="/design-tokens/build/rare-tokens.css" />
+<link rel="stylesheet" href="/level-up/level-up.css" />
+<style>
+  .survey{display:grid;gap:var(--rare-space-7)}
+  .q{display:grid;gap:var(--rare-space-3);border:0}
+  .q + .q{padding-top:var(--rare-space-7);border-top:var(--rare-border-width-default) solid var(--rare-color-border-default)}
+  .q-label{
+    display:flex;gap:var(--rare-space-3);align-items:baseline;
+    font-family:var(--rare-font-family-display);font-weight:var(--rare-font-weight-bold);
+    font-size:var(--rare-font-size-500);line-height:1.25;color:var(--lu-navy);
+  }
+  .q-num{   /* small navy speech bubble with the question number */
+    flex:none;display:inline-flex;align-items:center;justify-content:center;
+    width:1.6em;height:1.6em;font-size:var(--rare-font-size-300);
+    background:var(--lu-navy);color:var(--rare-color-orange-500);
+    border-radius:50% 50% 50% 4px;transform:translateY(-.1em);
+  }
+  .q-optional{font-family:var(--rare-font-family-text);font-weight:var(--rare-font-weight-regular);font-size:var(--rare-font-size-300);color:var(--rare-color-text-muted)}
+  textarea,input[type="text"]{
+    width:100%;font:inherit;font-size:var(--rare-font-size-300);color:inherit;
+    background:var(--rare-color-background-default);
+    border:var(--rare-border-width-strong) solid var(--rare-color-border-default);
+    border-radius:var(--rare-radius-md);padding:var(--rare-space-3) var(--rare-space-4);
+  }
+  textarea{min-height:7.5em;resize:vertical}
+  textarea:hover,input[type="text"]:hover{border-color:var(--rare-color-border-strong)}
+  .count{justify-self:end;font-size:var(--rare-font-size-200);color:var(--rare-color-text-muted);font-variant-numeric:tabular-nums}
+
+  /* Likert — five radio "tiles" in one row at every width */
+  .likert{display:grid;grid-template-columns:repeat(5,1fr);gap:var(--rare-space-2)}
+  .likert input{position:absolute;opacity:0;pointer-events:none}
+  .likert label{
+    display:flex;flex-direction:column;align-items:center;gap:var(--rare-space-1);
+    padding:var(--rare-space-3) var(--rare-space-1);min-height:100%;text-align:center;cursor:pointer;
+    border:var(--rare-border-width-strong) solid var(--rare-color-border-default);
+    border-radius:var(--rare-radius-md);background:var(--rare-color-background-default);
+    transition:border-color var(--rare-motion-duration-fast) var(--rare-motion-easing-standard),
+               background var(--rare-motion-duration-fast) var(--rare-motion-easing-standard);
+  }
+  .likert label:hover{border-color:var(--lu-navy-soft)}
+  .likert-n{font-family:var(--rare-font-family-display);font-weight:var(--rare-font-weight-extrabold);font-size:var(--rare-font-size-600);line-height:1;color:var(--lu-navy)}
+  .likert-t{font-size:var(--rare-font-size-200);line-height:1.2;color:var(--rare-color-text-muted)}
+  .likert input:checked + label{background:var(--lu-navy);border-color:var(--lu-navy)}
+  .likert input:checked + label .likert-n{color:var(--rare-color-orange-500)}
+  .likert input:checked + label .likert-t{color:var(--rare-color-text-on-brand)}
+  .likert input:focus-visible + label{outline:var(--rare-border-width-focus) solid var(--rare-color-focus-ring);outline-offset:var(--rare-border-offset-focus)}
+  @media (max-width:419px){.likert-t{font-size:.75rem}}
+
+  .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+  .submit-row{display:flex;flex-wrap:wrap;align-items:center;gap:var(--rare-space-4);padding-top:var(--rare-space-2)}
+  .form-status{font-size:var(--rare-font-size-300);font-weight:var(--rare-font-weight-semibold);color:var(--rare-color-feedback-error)}
+  .form-status:empty{display:none}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <nav class="nav-inner" aria-label="Primary">
+      <div class="nav-brand">
+        <a class="nav-logo" href="/" aria-label="Speak Sustainability — home">
+          <img src="/assets/speak-sustainability-logo.svg" alt="Speak Sustainability" width="201" height="26" />
+        </a>
+        <span class="nav-by">by <a href="https://rare.org/">Rare</a></span>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <section class="lu-hero" aria-labelledby="hero-heading">
+      <div class="lu-tiles" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+      <div class="lu-hero-body">
+        <p class="lu-eyebrow">Level Up</p>
+        <h1 class="lu-headline" id="hero-heading">Thanks for leveling up with us.</h1>
+        <p class="lu-sub">Four quick questions, about two minutes. Then we'll take you straight to <strong>the resources from today's workshop</strong>.</p>
+      </div>
+    </section>
+
+    <div class="lu-card">
+      <form class="survey" id="survey" novalidate>
+        <div class="q">
+          <label class="q-label" for="obstacle"><span class="q-num" aria-hidden="true">1</span>What's the biggest obstacle for your org to talk more about climate?</label>
+          <textarea id="obstacle" name="biggest_obstacle" maxlength="1000" aria-describedby="obstacle-count"></textarea>
+          <span class="count" id="obstacle-count" aria-live="off">0 / 1000</span>
+        </div>
+
+        <div class="q">
+          <p class="q-label" id="likelihood-label"><span class="q-num" aria-hidden="true">2</span>How likely are you to be able to put these principles and/or AI tool into practice?</p>
+          <div class="likert" role="radiogroup" aria-labelledby="likelihood-label">
+            <div><input type="radio" id="l1" name="likelihood" value="1" /><label for="l1"><span class="likert-n">1</span><span class="likert-t">Very unlikely</span></label></div>
+            <div><input type="radio" id="l2" name="likelihood" value="2" /><label for="l2"><span class="likert-n">2</span><span class="likert-t">Unlikely</span></label></div>
+            <div><input type="radio" id="l3" name="likelihood" value="3" /><label for="l3"><span class="likert-n">3</span><span class="likert-t">Not sure</span></label></div>
+            <div><input type="radio" id="l4" name="likelihood" value="4" /><label for="l4"><span class="likert-n">4</span><span class="likert-t">Likely</span></label></div>
+            <div><input type="radio" id="l5" name="likelihood" value="5" /><label for="l5"><span class="likert-n">5</span><span class="likert-t">Very likely</span></label></div>
+          </div>
+        </div>
+
+        <div class="q">
+          <label class="q-label" for="support"><span class="q-num" aria-hidden="true">3</span>What's one way that TCC could best support YOU in the next 6 months?</label>
+          <textarea id="support" name="support_request" maxlength="1000" aria-describedby="support-count"></textarea>
+          <span class="count" id="support-count" aria-live="off">0 / 1000</span>
+        </div>
+
+        <div class="q">
+          <label class="q-label" for="name"><span class="q-num" aria-hidden="true">4</span><span>Your name <span class="q-optional">(optional)</span></span></label>
+          <input type="text" id="name" name="name" maxlength="120" autocomplete="name" />
+        </div>
+
+        <div class="hp" aria-hidden="true">
+          <label for="hp_field">Leave this field empty</label>
+          <input type="text" id="hp_field" name="hp_field" tabindex="-1" autocomplete="off" />
+        </div>
+
+        <div class="submit-row">
+          <button class="btn btn-primary" type="submit" id="submit">Submit &amp; see resources</button>
+          <p class="form-status" id="status" role="alert"></p>
+        </div>
+      </form>
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-legal">
+      <span>© 2026 Rare. All rights reserved.</span>
+      <a href="/privacy/">Privacy notice</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var form = document.getElementById("survey");
+  var status = document.getElementById("status");
+  var submit = document.getElementById("submit");
+  var RESOURCES = "/level-up/resources/";
+
+  [["obstacle", "obstacle-count"], ["support", "support-count"]].forEach(function (pair) {
+    var field = document.getElementById(pair[0]);
+    var count = document.getElementById(pair[1]);
+    field.addEventListener("input", function () {
+      count.textContent = field.value.length + " / 1000";
+    });
+  });
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var data = new FormData(form);
+    var payload = {
+      biggest_obstacle: (data.get("biggest_obstacle") || "").trim(),
+      likelihood: data.get("likelihood") ? Number(data.get("likelihood")) : null,
+      support_request: (data.get("support_request") || "").trim(),
+      name: (data.get("name") || "").trim(),
+      hp_field: data.get("hp_field") || ""
+    };
+
+    if (!payload.biggest_obstacle && !payload.support_request && !payload.name && payload.likelihood === null) {
+      status.textContent = "Please answer at least one question.";
+      return;
+    }
+
+    status.textContent = "";
+    submit.disabled = true;
+    submit.textContent = "Sending…";
+
+    fetch("/api/workshop-survey", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    })
+      .then(function (res) {
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        window.location.href = RESOURCES + "?thanks=1";
+      })
+      .catch(function () {
+        submit.disabled = false;
+        submit.textContent = "Submit & see resources";
+        status.innerHTML = 'Something went wrong. Please try again, or <a href="' + RESOURCES + '">go to the resources</a>.';
+      });
+  });
+})();
+</script>
+</body>
+</html>
