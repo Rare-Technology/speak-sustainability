@@ -89,11 +89,6 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
   line-height:var(--rare-line-height-tight);letter-spacing:-.01em;
   margin-bottom:var(--rare-space-4);max-width:18ch;
 }
-.lu-headline em{   /* the deck's orange highlight block */
-  font-style:normal;color:var(--lu-navy);background:var(--rare-color-orange-500);
-  padding:0 .12em;border-radius:var(--rare-radius-sm);
-  -webkit-box-decoration-break:clone;box-decoration-break:clone;
-}
 .lu-sub{color:var(--lu-lavender);font-size:var(--rare-font-size-400);max-width:52ch}
 .lu-sub strong{color:var(--rare-color-text-on-brand);font-weight:var(--rare-font-weight-semibold)}
 
