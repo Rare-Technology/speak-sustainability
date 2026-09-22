@@ -470,21 +470,24 @@
   .case-card:nth-child(3) .case-reveal{color:var(--ss-card-ink-3)}
   .case-card:hover .case-reveal,
   .case-card:focus-within .case-reveal{opacity:1}
-  /* Rollover illustration: fades in flush to the card's bottom-left corner. Absolute
-     offsets resolve against the padding box, so left/bottom:0 lands on the card corner,
-     ignoring the card padding (zero padding, as requested). The image's own transparent
-     bottom + left padding is intentional and supplies the spacing. Decorative
-     (aria-hidden); sits behind the text. */
+  /* Illustration flush to the card's bottom-left corner. Absolute offsets resolve
+     against the padding box, so left/bottom:0 lands on the card corner, ignoring the
+     card padding (zero padding, as requested). The image's own transparent bottom +
+     left padding is intentional and supplies the spacing. Decorative (aria-hidden);
+     sits behind the text. At rest it shows as a light grayscale version (desaturated
+     and faded toward the card background); rollover restores full colour. */
   .case-media{
     position:absolute;left:0;bottom:0;
     width:42%;max-width:184px;height:auto;
-    opacity:0;
+    filter:grayscale(1);
+    opacity:.35;
     z-index:var(--rare-elevation-z-base);
     pointer-events:none;
-    transition:opacity var(--rare-motion-duration-fast) var(--rare-motion-easing-standard);
+    transition:opacity var(--rare-motion-duration-fast) var(--rare-motion-easing-standard),
+               filter var(--rare-motion-duration-fast) var(--rare-motion-easing-standard);
   }
   .case-card:hover .case-media,
-  .case-card:focus-within .case-media{opacity:1}
+  .case-card:focus-within .case-media{filter:none;opacity:1}
   /* Below the wide breakpoint the reveal copy fills the smaller cards; drop the
      illustration there so it can't collide with the text (matches Change Agent). */
   @media (max-width:1024px){
