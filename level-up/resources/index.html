@@ -29,12 +29,15 @@
   }
   .resource p.desc{color:var(--rare-color-text-default);font-size:var(--rare-font-size-300);margin-block:var(--rare-space-3) var(--rare-space-5)}
 
-  .share{
-    margin-top:var(--rare-space-5);padding:var(--rare-space-5) var(--rare-space-6);
-    background:var(--rare-color-orange-500);color:var(--lu-navy);border-radius:var(--rare-radius-card);
-    font-family:var(--rare-font-family-display);font-weight:var(--rare-font-weight-bold);
-    font-size:var(--rare-font-size-500);line-height:1.25;
+  /* Share panel — a ready-to-send message for a teammate, plus a copy button */
+  .share{margin-top:var(--rare-space-5)}
+  .share-message{
+    margin-block:var(--rare-space-4) var(--rare-space-5);padding:var(--rare-space-4) var(--rare-space-5);
+    background:var(--rare-color-background-subtle);border-left:4px solid var(--rare-color-orange-500);
+    border-radius:var(--rare-radius-md);font-size:var(--rare-font-size-300);white-space:pre-line;
+    overflow-wrap:anywhere;
   }
+  .share-message a{color:var(--rare-color-action-primary)}
 
   .partners{margin-top:var(--rare-space-9);text-align:center}
   .partners-label{font-size:var(--rare-font-size-200);color:var(--rare-color-text-muted);margin-bottom:var(--rare-space-4)}
@@ -94,7 +97,12 @@
       </article>
     </div>
 
-    <p class="share">Share the principles and the AI skill with your team.</p>
+    <section class="lu-card share" aria-labelledby="share-heading">
+      <h2 class="lu-section-heading" id="share-heading">Share these resources with your team.</h2>
+      <p class="share-message" id="share-message"></p>
+      <button class="btn btn-primary" type="button" id="share-copy">Copy message</button>
+      <span class="visually-hidden" id="share-status" role="status"></span>
+    </section>
 
     <section class="partners" aria-labelledby="partners-heading">
       <h2 class="partners-label" id="partners-heading">Brought to you by</h2>
@@ -119,6 +127,56 @@
   if (new URLSearchParams(location.search).has("thanks")) {
     document.getElementById("thanks").hidden = false;
   }
+
+  (function () {
+    // One source for both the preview and the copied text, so they can't drift.
+    var URL = "https://speaksustainability.org/level-up/resources/";
+    var MESSAGE =
+      "Hi team,\n\n" +
+      "I just attended Level Up, a climate communication workshop at Climate Week NYC. Two resources from it are worth a look:\n\n" +
+      "• Eight Principles for Effective and Inviting Climate Communication: Rare's research-backed guide to climate messages that connect\n" +
+      "• Speak Sustainability: an AI skill that reviews our comms against those principles and suggests improvements\n\n" +
+      "Both are here: " + URL;
+
+    var preview = document.getElementById("share-message");
+    var parts = MESSAGE.split(URL);
+    preview.append(parts[0]);
+    var link = document.createElement("a");
+    link.href = URL;
+    link.textContent = URL;
+    preview.append(link, parts[1]);
+
+    var button = document.getElementById("share-copy");
+    var status = document.getElementById("share-status");
+    var resetTimer;
+
+    function fallbackCopy() {
+      var ta = document.createElement("textarea");
+      ta.value = MESSAGE;
+      ta.setAttribute("readonly", "");
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = document.execCommand("copy");
+      document.body.removeChild(ta);
+      return ok ? Promise.resolve() : Promise.reject();
+    }
+
+    function done(label) {
+      button.textContent = label;
+      status.textContent = label;
+      clearTimeout(resetTimer);
+      resetTimer = setTimeout(function () { button.textContent = "Copy message"; status.textContent = ""; }, 2500);
+    }
+
+    button.addEventListener("click", function () {
+      var copy = navigator.clipboard && window.isSecureContext
+        ? navigator.clipboard.writeText(MESSAGE).catch(fallbackCopy)
+        : fallbackCopy();
+      copy.then(function () { done("Copied!"); }, function () { done("Couldn't copy. Select the text instead"); });
+    });
+  })();
 </script>
 </body>
 </html>
