@@ -122,20 +122,6 @@
   .nav-by a:hover,
   .nav-by a:focus-visible{text-decoration:underline}
 
-  /* Hamburger toggle — hidden until the mobile breakpoint */
-  .nav-toggle{
-    display:none;
-    align-items:center;justify-content:center;
-    background:none;border:none;cursor:pointer;
-    padding:var(--rare-space-2);
-    color:var(--rare-color-text-default);
-    border-radius:var(--rare-radius-sm);
-    transition:color var(--rare-motion-duration-fast) var(--rare-motion-easing-standard);
-  }
-  .nav-toggle:hover{color:var(--rare-color-action-primary)}
-  .nav-toggle-close{display:none}
-  .nav-toggle[aria-expanded="true"] .nav-toggle-open{display:none}
-  .nav-toggle[aria-expanded="true"] .nav-toggle-close{display:block}
   .btn{
     display:inline-flex;align-items:center;justify-content:center;
     font-family:var(--rare-font-family-text);
@@ -157,30 +143,15 @@
     border-radius:var(--rare-radius-pill);
   }
 
-  /* Mobile — the actions collapse behind the hamburger; open = full-screen menu */
+  /* Mobile — no hamburger: Sign up is the only nav action and it's critical, so it
+     stays visible at every width. Shrink the logo and drop the "by Rare" sublabel so
+     the logo and button fit side by side on phones. */
   @media (max-width:639px){
-    .nav-toggle{display:inline-flex}
-    /* Keep the logo and the close (X) control above the overlay, in place */
-    .nav-logo,
-    .nav-toggle{position:relative;z-index:var(--rare-elevation-z-modal)}
-
-    .nav-right{display:none}
-    .nav-toggle[aria-expanded="true"] ~ .nav-right{
-      display:flex;
-      position:fixed;inset:0;z-index:var(--rare-elevation-z-overlay);
-      flex-direction:column;align-items:flex-start;
-      gap:var(--rare-space-5);
-      overflow-y:auto;
-      background:var(--rare-color-background-default);
-      /* clear the header (padding-block ×2 + toggle height) so the list sits below the logo */
-      padding:calc(var(--rare-space-6) * 2 + var(--rare-space-8)) var(--rare-space-6) var(--rare-space-6);
-    }
-    /* Shrink the logo and drop the "by Rare" sublabel so the header fits phones */
+    .nav-inner{gap:var(--rare-space-4)}
     .nav-logo img{height:22px}
     .nav-by{display:none}
+    .nav-right .btn{white-space:nowrap}
   }
-  /* Lock background scroll while the full-screen menu is open */
-  body.nav-menu-open{overflow:hidden}
 
   /* ============================================================
      §2  HERO  (green brand panel — surface.brand now Rare Green)
@@ -811,12 +782,7 @@
         </a>
         <span class="nav-by">by <a href="https://rare.org/">Rare</a></span>
       </div>
-      <button class="nav-toggle" type="button" id="nav-toggle"
-              aria-expanded="false" aria-controls="nav-menu" aria-label="Menu">
-        <svg class="nav-toggle-open" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        <svg class="nav-toggle-close" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      </button>
-      <div class="nav-right" id="nav-menu">
+      <div class="nav-right">
         <a class="btn btn-primary" href="#signup">Sign up</a>
       </div>
     </nav>
@@ -1304,43 +1270,6 @@
     paras.forEach(function(p, i){ if(ACCORDION_COPY[i]) p.textContent = ACCORDION_COPY[i]; });
   })();
 
-  /* ---------------------------------------------------------
-     §1 GLOBAL NAV — mobile hamburger toggle
-     --------------------------------------------------------- */
-  (function navMenu(){
-    var toggle = document.getElementById("nav-toggle");
-    var menu   = document.getElementById("nav-menu");
-    if(!toggle || !menu) return;
-
-    function isOpen(){ return toggle.getAttribute("aria-expanded") === "true"; }
-    function setOpen(open){
-      toggle.setAttribute("aria-expanded", open ? "true" : "false");
-      document.body.classList.toggle("nav-menu-open", open);
-    }
-
-    toggle.addEventListener("click", function(){ setOpen(!isOpen()); });
-
-    // Activating a menu item closes the panel
-    menu.addEventListener("click", function(e){
-      if(e.target.closest("a")) setOpen(false);
-    });
-
-    // Escape closes and restores focus to the toggle
-    document.addEventListener("keydown", function(e){
-      if(e.key === "Escape" && isOpen()){ setOpen(false); toggle.focus(); }
-    });
-
-    // A click outside the nav closes the panel
-    document.addEventListener("click", function(e){
-      if(isOpen() && !e.target.closest(".nav-inner")) setOpen(false);
-    });
-
-    // Reset state once we leave the mobile breakpoint (the panel only exists <640px)
-    var desktop = window.matchMedia("(min-width:640px)");
-    window.addEventListener("resize", function(){
-      if(desktop.matches && isOpen()) setOpen(false);
-    });
-  })();
 
   /* ---------------------------------------------------------
      §3 ACCORDION — one open at a time, keyboard accessible
