@@ -459,10 +459,11 @@
   }
   .case-card:hover .case-media,
   .case-card:focus-within .case-media{filter:none;opacity:1}
-  /* Below the wide breakpoint the reveal copy fills the smaller cards; drop the
-     illustration there so it can't collide with the text (matches Change Agent). */
+  /* Below the wide breakpoint the reveal copy fills more of the smaller cards, so
+     shrink the illustration to clear it: 36% of the card from 375px up, 30% on the
+     smallest phones (the 240px card leaves only ~61px under the copy). */
   @media (max-width:1024px){
-    .case-media{display:none}
+    .case-media{width:36%}
 
     /* Small breakpoints: swap the 3-up grid for a horizontal scroll-snap carousel
        of smaller cards (like Change Agent's Use Cases). Full-bleed so the track
@@ -486,6 +487,9 @@
       width:clamp(240px, 74vw, 300px);                        /* smaller than the desktop 3-up card */
       scroll-snap-align:start;
     }
+  }
+  @media (max-width:374px){
+    .case-media{width:30%}
   }
   .case-card > :where(.case-title, .case-desc, .case-reveal){position:relative;z-index:var(--rare-elevation-z-raised)}
 
