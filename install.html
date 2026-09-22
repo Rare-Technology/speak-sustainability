@@ -188,6 +188,51 @@
   .footer-legal{display:flex;flex-wrap:wrap;gap:var(--rare-space-4);justify-content:space-between;color:var(--rare-color-text-muted);font-size:var(--rare-font-size-200)}
   .footer-legal a{color:inherit;text-decoration:underline}
 
+  /* ---------------------------------------------------------
+     Phone panel — shown only when the visitor looks like they're on a
+     phone/tablet (see the "mobile" IIFE in the script). No Path A client
+     lets you add a skill from its phone app, so this offers to email the
+     access link back for later instead of leaving them at a dead end.
+     --------------------------------------------------------- */
+  .mobile-panel{
+    margin-top:var(--rare-space-7);
+    background:var(--rare-color-background-default);
+    border:var(--rare-border-width-default) solid var(--rare-color-border-default);
+    border-left:4px solid var(--rare-color-action-primary);
+    border-radius:var(--rare-radius-card);
+    padding:var(--rare-space-6);
+  }
+  .mobile-panel[hidden]{display:none}
+  .mobile-panel h2{font-family:var(--rare-font-family-display);font-weight:var(--rare-font-weight-bold);font-size:var(--rare-font-size-500);line-height:var(--rare-line-height-tight)}
+  .mobile-panel p{margin-top:var(--rare-space-3);color:var(--rare-color-text-muted);font-size:var(--rare-font-size-300)}
+  .mobile-panel fieldset{border:none;margin-top:var(--rare-space-5);display:flex;flex-direction:column;gap:var(--rare-space-2)}
+  .mobile-panel legend{font-weight:var(--rare-font-weight-semibold);font-size:var(--rare-font-size-300);margin-bottom:var(--rare-space-2)}
+  .remind-opt{
+    display:flex;align-items:flex-start;gap:var(--rare-space-3);cursor:pointer;
+    border:var(--rare-border-width-default) solid var(--rare-color-border-default);
+    border-radius:var(--rare-radius-md);padding:var(--rare-space-3) var(--rare-space-4);
+    font-size:var(--rare-font-size-300);
+  }
+  .remind-opt:has(input:checked){border-color:var(--rare-color-action-primary);background:var(--rare-color-background-subtle)}
+  .remind-opt[hidden]{display:none}
+  .remind-opt input{margin-top:.3em;accent-color:var(--rare-color-action-primary)}
+  .remind-opt-sub{display:block;color:var(--rare-color-text-muted);font-size:var(--rare-font-size-200)}
+  .remind-custom{margin-top:var(--rare-space-2)}
+  .remind-custom[hidden]{display:none}
+  .remind-custom input{
+    width:100%;font:inherit;font-size:var(--rare-font-size-300);
+    padding:var(--rare-space-3);border-radius:var(--rare-radius-md);
+    border:var(--rare-border-width-default) solid var(--rare-color-border-strong);
+    background:var(--rare-color-background-default);color:var(--rare-color-text-default);
+  }
+  .mobile-panel .cta-row{margin-top:var(--rare-space-5)}
+  .mobile-panel .btn[disabled]{opacity:.6;cursor:progress}
+  .remind-status{margin-top:var(--rare-space-4);font-size:var(--rare-font-size-300)}
+  .remind-status:empty{display:none}
+  .remind-status[data-kind="error"]{color:var(--rare-color-text-default);font-weight:var(--rare-font-weight-semibold)}
+  .remind-done h2{color:var(--rare-color-text-default)}
+  .remind-done[hidden],.remind-form[hidden]{display:none}
+
   /* Anchor targets shouldn't sit flush under the (transparent) nav */
   #path-a,#path-b{scroll-margin-top:var(--rare-space-6)}
 </style>
@@ -214,6 +259,57 @@
     <div class="container">
       <p class="eyebrow">Install</p>
       <h1 class="section-heading">Install: Speak Sustainability</h1>
+      <div class="mobile-panel" id="mobile-panel" role="region" aria-labelledby="mobile-panel-title" hidden>
+        <div class="remind-form" id="remind-form">
+          <h2 id="mobile-panel-title">On your phone? Finish on a computer.</h2>
+          <p>
+            ChatGPT, Claude, and Gemini only let you add skills from a computer.
+            Setup takes about two minutes, and once it's installed you can use it
+            from your phone too. We'll email you this link for later.
+          </p>
+          <fieldset>
+            <legend>When should we send it?</legend>
+            <label class="remind-opt">
+              <input type="radio" name="remind-when" value="monday" checked />
+              <span><span id="remind-monday-label">Monday, 8:00 AM ET</span>
+                <span class="remind-opt-sub" id="remind-monday-sub"></span></span>
+            </label>
+            <label class="remind-opt" id="remind-tonight-opt">
+              <input type="radio" name="remind-when" value="tonight" />
+              <span>Tonight, 7:00 PM</span>
+            </label>
+            <label class="remind-opt">
+              <input type="radio" name="remind-when" value="tomorrow" />
+              <span>Tomorrow, 9:00 AM</span>
+            </label>
+            <label class="remind-opt">
+              <input type="radio" name="remind-when" value="now" />
+              <span>Right now</span>
+            </label>
+            <label class="remind-opt">
+              <input type="radio" name="remind-when" value="custom" />
+              <span>Pick a time</span>
+            </label>
+            <div class="remind-custom" id="remind-custom" hidden>
+              <label for="remind-custom-input" class="remind-opt-sub">Date and time (your local time)</label>
+              <input type="datetime-local" id="remind-custom-input" />
+            </div>
+          </fieldset>
+          <div class="cta-row">
+            <button type="button" class="btn btn-primary" id="remind-submit">Email me the link</button>
+            <button type="button" class="btn-ghost" id="mobile-dismiss">I'm on a computer — hide this</button>
+          </div>
+        </div>
+        <div class="remind-done" id="remind-done" hidden>
+          <h2 id="remind-done-title" tabindex="-1">You're set.</h2>
+          <p id="remind-done-text"></p>
+          <div class="cta-row">
+            <button type="button" class="btn-ghost" id="remind-again">Pick a different time</button>
+          </div>
+        </div>
+        <p class="remind-status" id="remind-status" role="status" aria-live="polite"></p>
+      </div>
+
       <p class="lead">Choose your primary method of use.</p>
       <p class="note">
         Appears as <strong>Speak Sustainability</strong> in ChatGPT's Skills list. In
@@ -254,6 +350,7 @@
         <a class="btn-ghost" id="dl-claude" href="#">Using Claude? Download the Claude-specific package instead →</a>
       </div>
       <p class="note">For ChatGPT and Gemini, use the standard package. Claude needs its own package — see the note above.</p>
+      <p class="note"><strong>Install from a computer.</strong> None of these clients let you add a skill from their phone apps. Once it's installed, you can use it from most of their phone apps too.</p>
 
       <div class="tabs">
         <div class="tablist" role="tablist" aria-label="Install steps by platform">
@@ -313,8 +410,7 @@
 
       <p class="note">
         Requires a desktop or laptop with Node.js installed — this path won't
-        work from a phone or tablet. On mobile, use
-        <a href="#path-a">Web/Desktop LLM Clients</a> instead.
+        work from a phone or tablet.
       </p>
 
       <div class="terminal">
@@ -468,6 +564,163 @@ Our organization is committed to achieving net-zero emissions by 2050 through am
     dlStandard.href = "/api/access-download?t=" + encoded + "&variant=standard";
     dlClaude.href = "/api/access-download?t=" + encoded + "&variant=claude";
   }
+
+  /* ---------------------------------------------------------
+     Phone panel — detect phone/tablet and offer to email the access link
+     for later (api/remind.js). Detection is deliberately generous (iPads
+     report as Macs, so touch + Mac UA counts) and always dismissible, since
+     the instructions below stay visible either way. ?device=mobile|desktop
+     forces it for testing.
+     --------------------------------------------------------- */
+  (function mobile(){
+    var panel = document.getElementById("mobile-panel");
+    if(!panel) return;
+
+    var forced = new URLSearchParams(location.search).get("device");
+    var ua = navigator.userAgent || "";
+    var isMobile = forced === "mobile" ? true : forced === "desktop" ? false : (
+      (navigator.userAgentData && navigator.userAgentData.mobile) ||
+      /Android|iPhone|iPad|iPod|Mobile/i.test(ua) ||
+      (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1) ||
+      (window.matchMedia && matchMedia("(pointer: coarse)").matches && matchMedia("(max-width: 1024px)").matches)
+    );
+    if(!isMobile || (!token && forced !== "mobile")) return;
+    panel.hidden = false;
+
+    var ET = "America/New_York";
+    var localTz = (Intl.DateTimeFormat().resolvedOptions().timeZone) || ET;
+
+    // Offset (ms) of a time zone from UTC at a given instant.
+    function tzOffset(date, tz){
+      var p = {};
+      new Intl.DateTimeFormat("en-US", {timeZone:tz, hourCycle:"h23", year:"numeric", month:"2-digit", day:"2-digit", hour:"2-digit", minute:"2-digit", second:"2-digit"})
+        .formatToParts(date).forEach(function(x){ p[x.type] = x.value; });
+      return Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute, +p.second) - date.getTime();
+    }
+    // Wall-clock time in tz → Date. Second pass corrects across a DST change.
+    function zoned(y, m, d, h, min, tz){
+      var guess = Date.UTC(y, m, d, h, min);
+      var t = guess - tzOffset(new Date(guess), tz);
+      var off2 = tzOffset(new Date(t), tz);
+      return new Date(guess - off2);
+    }
+    // Next Monday (strictly after today, in ET) at 8:00 AM ET.
+    function nextMonday8Et(){
+      var p = {};
+      new Intl.DateTimeFormat("en-US", {timeZone:ET, year:"numeric", month:"numeric", day:"numeric"})
+        .formatToParts(new Date()).forEach(function(x){ p[x.type] = x.value; });
+      var todayUtc = new Date(Date.UTC(+p.year, +p.month - 1, +p.day));
+      var days = ((1 - todayUtc.getUTCDay() + 7) % 7) || 7;
+      var mon = new Date(todayUtc.getTime() + days * 86400000);
+      return zoned(mon.getUTCFullYear(), mon.getUTCMonth(), mon.getUTCDate(), 8, 0, ET);
+    }
+    function fmt(date, tz, withDay){
+      var opts = {timeZone:tz, hour:"numeric", minute:"2-digit"};
+      if(withDay){ opts.weekday = "long"; opts.month = "short"; opts.day = "numeric"; }
+      return new Intl.DateTimeFormat("en-US", opts).format(date);
+    }
+    function localInputValue(d){
+      function pad(n){ return (n < 10 ? "0" : "") + n; }
+      return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()) + "T" + pad(d.getHours()) + ":" + pad(d.getMinutes());
+    }
+
+    var monday = nextMonday8Et();
+    document.getElementById("remind-monday-label").textContent = fmt(monday, ET, true) + " ET";
+    if(tzOffset(monday, localTz) !== tzOffset(monday, ET)){
+      document.getElementById("remind-monday-sub").textContent = "That's " + fmt(monday, localTz, true) + " where you are.";
+    }
+
+    var now = new Date();
+    if(now.getHours() * 60 + now.getMinutes() >= 18 * 60 + 30){
+      document.getElementById("remind-tonight-opt").hidden = true;
+    }
+
+    var customWrap = document.getElementById("remind-custom");
+    var customInput = document.getElementById("remind-custom-input");
+    customInput.min = localInputValue(new Date(now.getTime() + 10 * 60000));
+    customInput.max = localInputValue(new Date(now.getTime() + 29 * 86400000));
+    customInput.value = localInputValue(monday);
+
+    var radios = Array.prototype.slice.call(panel.querySelectorAll('input[name="remind-when"]'));
+    radios.forEach(function(r){
+      r.addEventListener("change", function(){
+        customWrap.hidden = r.value !== "custom" || !r.checked;
+      });
+    });
+
+    function chosenTime(){
+      var choice = radios.filter(function(r){ return r.checked; })[0];
+      var n = new Date();
+      switch(choice ? choice.value : "monday"){
+        case "now": return null;
+        case "tonight": return new Date(n.getFullYear(), n.getMonth(), n.getDate(), 19, 0);
+        case "tomorrow": return new Date(n.getFullYear(), n.getMonth(), n.getDate() + 1, 9, 0);
+        case "custom":
+          var d = customInput.value ? new Date(customInput.value) : null;
+          return d && !isNaN(d.getTime()) ? d : undefined;
+        default: return monday;
+      }
+    }
+
+    var form = document.getElementById("remind-form");
+    var done = document.getElementById("remind-done");
+    var status = document.getElementById("remind-status");
+    var submit = document.getElementById("remind-submit");
+    var ERRORS = {
+      time_in_past: "That time has already passed — pick a later one.",
+      too_far_ahead: "That's too far out — pick a time within the next few weeks.",
+      invalid_time: "That time didn't work — try picking it again.",
+      rate_limited: "You've already scheduled a few reminders today. Check your inbox, or try again tomorrow.",
+      expired: "This link has expired — email bschauer@rare.org for a fresh one."
+    };
+
+    function setStatus(msg, kind){
+      status.textContent = msg || "";
+      if(kind) status.setAttribute("data-kind", kind); else status.removeAttribute("data-kind");
+    }
+
+    submit.addEventListener("click", function(){
+      var when = chosenTime();
+      if(when === undefined){ setStatus("Pick a date and time first.", "error"); customInput.focus(); return; }
+      if(when && when.getTime() < Date.now()){ setStatus(ERRORS.time_in_past, "error"); return; }
+
+      submit.disabled = true;
+      setStatus("Sending…");
+      fetch("/api/remind", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({t: token, sendAt: when ? when.toISOString() : null})
+      }).then(function(r){
+        return r.json().catch(function(){ return {ok:false}; }).then(function(j){ return {status:r.status, body:j}; });
+      }).then(function(res){
+        submit.disabled = false;
+        if(!res.body.ok){
+          setStatus(ERRORS[res.body.error] || "Something went wrong — try again, or email bschauer@rare.org.", "error");
+          return;
+        }
+        setStatus("");
+        var at = res.body.scheduledFor ? new Date(res.body.scheduledFor) : null;
+        document.getElementById("remind-done-text").textContent = at
+          ? "We'll email you this link on " + fmt(at, localTz, true) + ". Open it on your laptop or desktop to install. You can keep browsing the steps below in the meantime."
+          : "We've emailed you this link — it should arrive in a minute or two. Open it on your laptop or desktop to install.";
+        form.hidden = true;
+        done.hidden = false;
+        document.getElementById("remind-done-title").focus();
+      }, function(){
+        submit.disabled = false;
+        setStatus("Couldn't reach the server — check your connection and try again.", "error");
+      });
+    });
+
+    document.getElementById("remind-again").addEventListener("click", function(){
+      done.hidden = true;
+      form.hidden = false;
+      submit.focus();
+    });
+    document.getElementById("mobile-dismiss").addEventListener("click", function(){
+      panel.hidden = true;
+    });
+  })();
 
   /* ---------------------------------------------------------
      6.1 Path selection — scroll to the matching section.

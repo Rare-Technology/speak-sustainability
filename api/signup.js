@@ -55,7 +55,7 @@ export default async function handler(req, res) {
     return;
   }
 
-  // --- Rate limit (FR-1.4: 5/hour per IP and per email) — checked before honeypot/fill-time
+  // --- Rate limit (FR-1.4: 5/hour per email, 100/hour per IP) — checked before honeypot/fill-time
   // so a flood of honeypot-tripped requests still gets throttled, not just silently absorbed. ---
   if (await isRateLimited({ email, ipHash })) {
     await logSignupAttempt({ email, ipHash, accepted: false, flagReason: "rate_limited" });
