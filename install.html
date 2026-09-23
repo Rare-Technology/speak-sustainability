@@ -21,7 +21,7 @@
 <style>
   /* Self-contained page chrome, same convention as confirmed.html /
      access-expired.html — not the full index.html stylesheet. Component
-     styles below (.path-card, .tabs, .terminal, .verify-box) are new for
+     styles below (.install-card, .cli-disclosure, .tabs, .terminal, .verify-box) are new for
      Phase 3 (FR-6); .accordion/.acc-* is copied verbatim from index.html's
      "How it works" accordion (same markup, CSS, and one-open-at-a-time JS). */
   *{box-sizing:border-box;margin:0;padding:0}
@@ -58,31 +58,64 @@
   .note strong{color:var(--rare-color-text-default)}
 
   /* ---------------------------------------------------------
-     6.1 Path selection — mirrors .principle-card's visual language
-     (button-as-card, tinted icon tile, hover lift) under a page-local
-     class name since index.html's stylesheet isn't imported here.
+     6.1 Install hero — no path fork. The web/desktop steps are the
+     default and sit in .install-card; the CLI path is a quiet text
+     link here plus the collapsed #cli disclosure below the card.
      --------------------------------------------------------- */
-  .install-hero{padding-block:var(--rare-space-11) var(--rare-space-9)}
-  .path-grid{display:grid;grid-template-columns:1fr;gap:var(--rare-space-5);margin-top:var(--rare-space-8)}
-  @media (min-width:768px){.path-grid{grid-template-columns:1fr 1fr}}
-  .path-card{
-    display:flex;flex-direction:column;gap:var(--rare-space-3);align-items:flex-start;text-align:left;
-    width:100%;font:inherit;color:inherit;cursor:pointer;
+  .install-hero{padding-block:var(--rare-space-11)}
+  .cli-link-row{margin-top:var(--rare-space-3);color:var(--rare-color-text-muted);font-size:var(--rare-font-size-200)}
+  .cli-link-row a{color:var(--rare-color-action-primary);font-weight:var(--rare-font-weight-semibold)}
+  .install-card{
+    margin-top:var(--rare-space-8);
     background:var(--rare-color-background-default);
     border:var(--rare-border-width-default) solid var(--rare-color-border-default);
     border-radius:var(--rare-radius-card);
     padding:var(--rare-space-7);
-    transition:border-color var(--rare-motion-duration-fast) var(--rare-motion-easing-standard),
-               box-shadow var(--rare-motion-duration-fast) var(--rare-motion-easing-standard),
-               transform var(--rare-motion-duration-fast) var(--rare-motion-easing-standard);
   }
-  .path-card:hover{border-color:var(--rare-color-border-strong);box-shadow:0 6px 20px rgba(26,29,31,.08);transform:translateY(-2px)}
-  .path-ico{width:44px;height:44px;border-radius:var(--rare-radius-md);background:var(--rare-color-background-muted);color:var(--rare-color-action-primary);display:flex;align-items:center;justify-content:center}
-  .path-title{font-family:var(--rare-font-family-display);font-weight:var(--rare-font-weight-bold);font-size:var(--rare-font-size-500)}
-  .path-desc{color:var(--rare-color-text-muted);font-size:var(--rare-font-size-300)}
+  @media (max-width:600px){.install-card{padding:var(--rare-space-5)}}
+  .step + .step{margin-top:var(--rare-space-7)}
+  .step-title{
+    display:flex;align-items:center;gap:var(--rare-space-3);
+    font-family:var(--rare-font-family-display);font-weight:var(--rare-font-weight-bold);
+    font-size:var(--rare-font-size-500);line-height:var(--rare-line-height-tight);
+    margin-bottom:var(--rare-space-4);
+  }
+  .step-num{
+    flex:0 0 auto;width:28px;height:28px;border-radius:50%;
+    display:inline-flex;align-items:center;justify-content:center;
+    background:var(--rare-color-action-primary);color:var(--rare-color-text-on-brand);
+    font-family:var(--rare-font-family-text);font-size:var(--rare-font-size-200);
+  }
+  .step > .note:first-of-type{margin-top:0}
+  .step .btn + .note{margin-top:var(--rare-space-3)}
 
   /* ---------------------------------------------------------
-     Path A/B section rhythm
+     6.3 CLI disclosure — native <details>, styled like .acc-item so it
+     reads as secondary/optional. Opened by #cli-link or a #cli / #path-b
+     hash (see script).
+     --------------------------------------------------------- */
+  .cli-disclosure{
+    margin-top:var(--rare-space-6);
+    background:var(--rare-color-background-default);
+    border:var(--rare-border-width-default) solid var(--rare-color-border-default);
+    border-radius:var(--rare-radius-lg);
+    scroll-margin-top:var(--rare-space-6);
+  }
+  .cli-disclosure summary{
+    display:flex;align-items:center;gap:var(--rare-space-3);cursor:pointer;list-style:none;
+    padding:var(--rare-space-5);
+  }
+  .cli-disclosure summary::-webkit-details-marker{display:none}
+  .cli-disclosure summary:focus-visible{outline:var(--rare-border-width-focus) solid var(--rare-color-focus-ring);outline-offset:var(--rare-border-offset-focus);border-radius:var(--rare-radius-lg)}
+  .cli-disclosure[open] .acc-chevron{transform:rotate(180deg)}
+  .cli-summary-text{flex:1;display:flex;flex-direction:column;gap:var(--rare-space-1)}
+  .cli-summary-title{font-weight:var(--rare-font-weight-semibold);font-size:var(--rare-font-size-400)}
+  .cli-summary-sub{color:var(--rare-color-text-muted);font-size:var(--rare-font-size-200)}
+  .cli-body{padding:0 var(--rare-space-5) var(--rare-space-5)}
+  .cli-body > .note:first-child{margin-top:0}
+
+  /* ---------------------------------------------------------
+     Section rhythm (verification, troubleshooting)
      --------------------------------------------------------- */
   .section{padding-block:var(--rare-space-11);border-top:var(--rare-border-width-default) solid var(--rare-color-border-default)}
   .section:nth-of-type(odd){background:var(--rare-color-background-default)}
@@ -93,7 +126,7 @@
      6.2 Platform tab bar — new component, WAI-ARIA Tabs pattern.
      Active tab: action-primary underline + text. Inactive: text-muted.
      --------------------------------------------------------- */
-  .tabs{margin-top:var(--rare-space-9)}
+  .tabs{margin-top:var(--rare-space-2)}
   /* Four tabs don't fit at phone width — scroll horizontally rather than
      wrap (wrapping orphaned "Gemini Enterprise" onto its own line, with the
      active-tab underline misaligned across the wrap). Same overflow-x
@@ -190,7 +223,7 @@
 
   /* ---------------------------------------------------------
      Phone panel — shown only when the visitor looks like they're on a
-     phone/tablet (see the "mobile" IIFE in the script). No Path A client
+     phone/tablet (see the "mobile" IIFE in the script). No web/desktop client
      lets you add a skill from its phone app, so this offers to email the
      access link back for later instead of leaving them at a dead end.
      --------------------------------------------------------- */
@@ -233,8 +266,6 @@
   .remind-done h2{color:var(--rare-color-text-default)}
   .remind-done[hidden],.remind-form[hidden]{display:none}
 
-  /* Anchor targets shouldn't sit flush under the (transparent) nav */
-  #path-a,#path-b{scroll-margin-top:var(--rare-space-6)}
 </style>
 </head>
 <body>
@@ -254,11 +285,20 @@
 
 <main>
 
-  <!-- ============================ 6.1 PATH SELECTION ============================ -->
+  <!-- ============================ 6.1–6.3 INSTALL ============================
+       The web/desktop install (ChatGPT, Claude, Gemini) is the default path and
+       fills the page. The command-line install is a collapsed disclosure (#cli)
+       for the minority who need it, reachable from the small link in the hero. -->
   <section class="install-hero">
     <div class="container">
       <p class="eyebrow">Install</p>
-      <h1 class="section-heading">Install: Speak Sustainability</h1>
+      <h1 class="section-heading">Install Speak Sustainability</h1>
+      <p class="lead">Add it to ChatGPT, Claude, or Gemini in about two minutes.</p>
+      <p class="cli-link-row">
+        Using Claude Code, Codex, Gemini CLI, or Cursor?
+        <a href="#cli" id="cli-link">Install with one command →</a>
+      </p>
+
       <div class="mobile-panel" id="mobile-panel" role="region" aria-labelledby="mobile-panel-title" hidden>
         <div class="remind-form" id="remind-form">
           <h2 id="mobile-panel-title">On your phone? Finish on a computer.</h2>
@@ -310,120 +350,117 @@
         <p class="remind-status" id="remind-status" role="status" aria-live="polite"></p>
       </div>
 
-      <p class="lead">Choose your primary method of use.</p>
-      <p class="note">
-        Appears as <strong>Speak Sustainability</strong> in ChatGPT's Skills list. In
-        Claude and Gemini, it shows as the lowercase <code>speak-sustainability</code> —
-        that's expected, not a typo; only ChatGPT supports a separate display name. The
-        steps below use whichever name each client actually shows.
-      </p>
+      <div class="install-card">
+        <div class="step">
+          <h2 class="step-title"><span class="step-num" aria-hidden="true">1</span>Choose your assistant</h2>
+          <p class="note">Install from a computer — none of these apps let you add a skill from their phone apps. Once it's installed, you can use it from most of their phone apps too.</p>
+        </div>
 
-      <div class="path-grid">
-        <button type="button" class="path-card" data-scroll-to="path-a">
-          <span class="path-ico" aria-hidden="true">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="13" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 21h8M12 17v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <div class="tabs">
+          <div class="tablist" role="tablist" aria-label="Your AI assistant">
+            <button class="tab" role="tab" id="tab-chatgpt" aria-controls="panel-chatgpt" aria-selected="true" tabindex="0">ChatGPT</button>
+            <button class="tab" role="tab" id="tab-claude" aria-controls="panel-claude" aria-selected="false" tabindex="-1">Claude</button>
+            <button class="tab" role="tab" id="tab-gemini-spark" aria-controls="panel-gemini-spark" aria-selected="false" tabindex="-1">Gemini Spark</button>
+            <button class="tab" role="tab" id="tab-gemini-ent" aria-controls="panel-gemini-ent" aria-selected="false" tabindex="-1">Gemini Enterprise</button>
+          </div>
+
+          <div class="tabpanel" role="tabpanel" id="panel-chatgpt" aria-labelledby="tab-chatgpt" tabindex="0">
+            <div class="step">
+              <h2 class="step-title"><span class="step-num" aria-hidden="true">2</span>Download the package</h2>
+              <a class="btn btn-primary dl-link" data-variant="standard" href="#">Download for ChatGPT (.zip)</a>
+            </div>
+            <div class="step">
+              <h2 class="step-title"><span class="step-num" aria-hidden="true">3</span>Upload it to ChatGPT</h2>
+              <ol>
+                <li>In the ChatGPT sidebar, select <strong>Plugins</strong>.</li>
+                <li>Open the <strong>Skills</strong> tab.</li>
+                <li>Select <strong>Create</strong>, then <strong>Upload from your computer</strong>.</li>
+                <li>Upload <code>speak-sustainability.zip</code>. It appears as <strong>Speak Sustainability</strong> in your Skills list.</li>
+              </ol>
+              <a class="next-link" href="#verify">Next: verify it worked ↓</a>
+            </div>
+          </div>
+          <div class="tabpanel" role="tabpanel" id="panel-claude" aria-labelledby="tab-claude" tabindex="0" hidden>
+            <div class="step">
+              <h2 class="step-title"><span class="step-num" aria-hidden="true">2</span>Download the package</h2>
+              <a class="btn btn-primary dl-link" data-variant="claude" href="#">Download for Claude (.zip)</a>
+              <p class="note">This is a Claude-only package. The ChatGPT and Gemini one won't run in Claude.</p>
+            </div>
+            <div class="step">
+              <h2 class="step-title"><span class="step-num" aria-hidden="true">3</span>Upload it to Claude</h2>
+              <ol>
+                <li>Make sure <strong>Cloud code execution and file creation</strong> is enabled in <strong>Settings → Capabilities</strong>.</li>
+                <li>Open <strong>Customize → Skills</strong>.</li>
+                <li>Click <strong>Add</strong>, then <strong>Upload skill</strong> — not "Create a skill," which starts a from-scratch skill instead of uploading this one.</li>
+                <li>Drag in (or browse to) <code>speak-sustainability-claude.zip</code> and save — a security scan runs automatically, then the skill is on by default. If it's ever off, toggle it back on from the "⋮" menu next to it in your skills list.</li>
+              </ol>
+              <p class="note">It shows as lowercase <code>speak-sustainability</code> in Claude — that's expected, not a typo.</p>
+              <a class="next-link" href="#verify">Next: verify it worked ↓</a>
+            </div>
+          </div>
+          <div class="tabpanel" role="tabpanel" id="panel-gemini-spark" aria-labelledby="tab-gemini-spark" tabindex="0" hidden>
+            <div class="step">
+              <h2 class="step-title"><span class="step-num" aria-hidden="true">2</span>Download the package</h2>
+              <a class="btn btn-primary dl-link" data-variant="standard" href="#">Download for Gemini (.zip)</a>
+            </div>
+            <div class="step">
+              <h2 class="step-title"><span class="step-num" aria-hidden="true">3</span>Upload it to Gemini Spark</h2>
+              <ol>
+                <li>Open <a href="https://gemini.google.com">Gemini</a> or the Gemini app on Mac.</li>
+                <li>Select <strong>Switch to Spark → Skills</strong>.</li>
+                <li>Select <strong>Upload</strong> and choose <code>speak-sustainability.zip</code>.</li>
+                <li>Review the skill, then select <strong>Create</strong>.</li>
+              </ol>
+              <p class="note">It shows as lowercase <code>speak-sustainability</code> in Gemini — that's expected, not a typo.</p>
+              <a class="next-link" href="#verify">Next: verify it worked ↓</a>
+            </div>
+          </div>
+          <div class="tabpanel" role="tabpanel" id="panel-gemini-ent" aria-labelledby="tab-gemini-ent" tabindex="0" hidden>
+            <div class="step">
+              <h2 class="step-title"><span class="step-num" aria-hidden="true">2</span>Download the package</h2>
+              <a class="btn btn-primary dl-link" data-variant="standard" href="#">Download for Gemini Enterprise (.zip)</a>
+            </div>
+            <div class="step">
+              <h2 class="step-title"><span class="step-num" aria-hidden="true">3</span>Upload it to Gemini Enterprise</h2>
+              <ol>
+                <li>In the Gemini Enterprise navigation menu, select <strong>Skills</strong>.</li>
+                <li>Select <strong>Import</strong>.</li>
+                <li>Upload <code>speak-sustainability.zip</code>, then select <strong>Import</strong>.</li>
+              </ol>
+              <p class="note">It shows as lowercase <code>speak-sustainability</code> in Gemini — that's expected, not a typo.</p>
+              <a class="next-link" href="#verify">Next: verify it worked ↓</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <details class="cli-disclosure" id="cli">
+        <summary>
+          <span class="cli-summary-text">
+            <span class="cli-summary-title">Advanced: install with a command-line agent</span>
+            <span class="cli-summary-sub">Claude Code, Codex, Gemini CLI, Cursor, or another supported agent.</span>
           </span>
-          <span class="path-title">Use with Web/Desktop LLM Clients</span>
-          <span class="path-desc">ChatGPT, Claude, Gemini, or Gemini Enterprise.</span>
-        </button>
-        <button type="button" class="path-card" data-scroll-to="path-b">
-          <span class="path-ico" aria-hidden="true">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" stroke-width="2"/><path d="M7 9l3 3-3 3M13 15h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </span>
-          <span class="path-title">Use with Command-Line Agents</span>
-          <span class="path-desc">Claude Code, Codex, Gemini CLI, Cursor, or another supported agent.</span>
-        </button>
-      </div>
-    </div>
-  </section>
+          <svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </summary>
+        <div class="cli-body">
+          <p class="note">
+            Requires a desktop or laptop with Node.js installed — this path won't
+            work from a phone or tablet.
+          </p>
 
-  <!-- ============================ 6.2 PATH A ============================ -->
-  <section class="section" id="path-a">
-    <div class="container">
-      <div class="section-head">
-        <p class="eyebrow">Path A</p>
-        <h2 class="section-heading">Use with Web/Desktop LLM Clients</h2>
-      </div>
-
-      <div class="cta-row">
-        <a class="btn btn-primary" id="dl-standard" href="#">Download Standard Package (.zip)</a>
-        <a class="btn-ghost" id="dl-claude" href="#">Using Claude? Download the Claude-specific package instead →</a>
-      </div>
-      <p class="note">For ChatGPT and Gemini, use the standard package. Claude needs its own package — see the note above.</p>
-      <p class="note"><strong>Install from a computer.</strong> None of these clients let you add a skill from their phone apps. Once it's installed, you can use it from most of their phone apps too.</p>
-
-      <div class="tabs">
-        <div class="tablist" role="tablist" aria-label="Install steps by platform">
-          <button class="tab" role="tab" id="tab-chatgpt" aria-controls="panel-chatgpt" aria-selected="true" tabindex="0">ChatGPT</button>
-          <button class="tab" role="tab" id="tab-claude" aria-controls="panel-claude" aria-selected="false" tabindex="-1">Claude</button>
-          <button class="tab" role="tab" id="tab-gemini-spark" aria-controls="panel-gemini-spark" aria-selected="false" tabindex="-1">Gemini Spark</button>
-          <button class="tab" role="tab" id="tab-gemini-ent" aria-controls="panel-gemini-ent" aria-selected="false" tabindex="-1">Gemini Enterprise</button>
-        </div>
-
-        <div class="tabpanel" role="tabpanel" id="panel-chatgpt" aria-labelledby="tab-chatgpt" tabindex="0">
-          <ol>
-            <li>In the ChatGPT sidebar, select <strong>Plugins</strong>.</li>
-            <li>Open the <strong>Skills</strong> tab.</li>
-            <li>Select <strong>Create</strong>, then <strong>Upload from your computer</strong>.</li>
-            <li>Upload <code>speak-sustainability.zip</code>.</li>
-          </ol>
+          <div class="terminal">
+            <div class="terminal-bar">
+              <span class="terminal-label">Terminal</span>
+              <button type="button" class="copy-btn" data-copy-target="cli-command">
+                <span data-label>Copy</span>
+              </button>
+            </div>
+            <pre><code id="cli-command">npx skills add https://github.com/Rare-Technology/speak-sustainability-skill/tree/main/skill/speak-sustainability --global</code></pre>
+          </div>
+          <p class="note">The installer prompts you to choose an available agent. Omit <code>--global</code> for a project-only installation.</p>
           <a class="next-link" href="#verify">Next: verify it worked ↓</a>
         </div>
-        <div class="tabpanel" role="tabpanel" id="panel-claude" aria-labelledby="tab-claude" tabindex="0" hidden>
-          <ol>
-            <li>Make sure <strong>Cloud code execution and file creation</strong> is enabled in <strong>Settings → Capabilities</strong>.</li>
-            <li>Open <strong>Customize → Skills</strong>.</li>
-            <li>Click <strong>Add</strong>, then <strong>Upload skill</strong> — not "Create a skill," which starts a from-scratch skill instead of uploading this one.</li>
-            <li>Drag in (or browse to) <code>speak-sustainability-claude.zip</code> and save — a security scan runs automatically, then the skill is on by default. If it's ever off, toggle it back on from the "⋮" menu next to it in your skills list.</li>
-          </ol>
-          <a class="next-link" href="#verify">Next: verify it worked ↓</a>
-        </div>
-        <div class="tabpanel" role="tabpanel" id="panel-gemini-spark" aria-labelledby="tab-gemini-spark" tabindex="0" hidden>
-          <ol>
-            <li>Open <a href="https://gemini.google.com">Gemini</a> or the Gemini app on Mac.</li>
-            <li>Select <strong>Switch to Spark → Skills</strong>.</li>
-            <li>Select <strong>Upload</strong> and choose <code>speak-sustainability.zip</code>.</li>
-            <li>Review the skill, then select <strong>Create</strong>.</li>
-          </ol>
-          <a class="next-link" href="#verify">Next: verify it worked ↓</a>
-        </div>
-        <div class="tabpanel" role="tabpanel" id="panel-gemini-ent" aria-labelledby="tab-gemini-ent" tabindex="0" hidden>
-          <ol>
-            <li>In the Gemini Enterprise navigation menu, select <strong>Skills</strong>.</li>
-            <li>Select <strong>Import</strong>.</li>
-            <li>Upload <code>speak-sustainability.zip</code>, then select <strong>Import</strong>.</li>
-          </ol>
-          <a class="next-link" href="#verify">Next: verify it worked ↓</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============================ 6.3 PATH B ============================ -->
-  <section class="section" id="path-b">
-    <div class="container">
-      <div class="section-head">
-        <p class="eyebrow">Path B</p>
-        <h2 class="section-heading">Use with Command-Line Agents</h2>
-        <p class="lead">Claude Code, Codex, Gemini CLI, Cursor, or another supported agent.</p>
-      </div>
-
-      <p class="note">
-        Requires a desktop or laptop with Node.js installed — this path won't
-        work from a phone or tablet.
-      </p>
-
-      <div class="terminal">
-        <div class="terminal-bar">
-          <span class="terminal-label">Terminal</span>
-          <button type="button" class="copy-btn" data-copy-target="cli-command">
-            <span data-label>Copy</span>
-          </button>
-        </div>
-        <pre><code id="cli-command">npx skills add https://github.com/Rare-Technology/speak-sustainability-skill/tree/main/skill/speak-sustainability --global</code></pre>
-      </div>
-      <p class="note">The installer prompts you to choose an available agent. Omit <code>--global</code> for a project-only installation.</p>
-      <a class="next-link" href="#verify">Next: verify it worked ↓</a>
+      </details>
     </div>
   </section>
 
@@ -433,7 +470,7 @@
       <div class="section-head">
         <p class="eyebrow">Verification</p>
         <h2 class="section-heading">Verify installation</h2>
-        <p class="lead">Works the same way for either path — right inside your client, not here.</p>
+        <p class="lead">Works the same way wherever you installed it — right inside your assistant, not here.</p>
       </div>
 
       <p class="note"><strong>Start a new chat first</strong> — a chat that was already open before you installed may not pick up the skill.</p>
@@ -483,7 +520,7 @@ Our organization is committed to achieving net-zero emissions by 2050 through am
             <svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button></h3>
           <div class="acc-panel" id="ts-p2" role="region" aria-labelledby="ts-t2">
-            <p>Make sure you downloaded the <strong>Claude-specific package</strong>, not the standard one — Claude won't run the standard package. After uploading, confirm the skill shows as enabled in your Skills list.</p>
+            <p>Make sure you downloaded from the <strong>Claude</strong> tab above (<code>speak-sustainability-claude.zip</code>) — Claude won't run the ChatGPT/Gemini package. After uploading, confirm the skill shows as enabled in your Skills list.</p>
           </div>
         </div>
         <div class="acc-item">
@@ -557,12 +594,12 @@ Our organization is committed to achieving net-zero emissions by 2050 through am
     return parts.length >= 2 && parts[0] === "access" ? parts[1] : "";
   })();
 
-  var dlStandard = document.getElementById("dl-standard");
-  var dlClaude = document.getElementById("dl-claude");
-  if(token && dlStandard && dlClaude){
+  // One download button per platform tab; data-variant picks the package.
+  if(token){
     var encoded = encodeURIComponent(token);
-    dlStandard.href = "/api/access-download?t=" + encoded + "&variant=standard";
-    dlClaude.href = "/api/access-download?t=" + encoded + "&variant=claude";
+    Array.prototype.forEach.call(document.querySelectorAll(".dl-link[data-variant]"), function(a){
+      a.href = "/api/access-download?t=" + encoded + "&variant=" + a.getAttribute("data-variant");
+    });
   }
 
   /* ---------------------------------------------------------
@@ -723,25 +760,44 @@ Our organization is committed to achieving net-zero emissions by 2050 through am
   })();
 
   /* ---------------------------------------------------------
-     6.1 Path selection — scroll to the matching section.
+     6.3 CLI disclosure — the hero's "Install with one command" link and
+     a #cli (or legacy #path-b) hash open it and bring it into view.
      --------------------------------------------------------- */
-  Array.prototype.forEach.call(document.querySelectorAll("[data-scroll-to]"), function(btn){
-    btn.addEventListener("click", function(){
-      var target = document.getElementById(btn.getAttribute("data-scroll-to"));
-      if(target) target.scrollIntoView({behavior:"smooth", block:"start"});
-    });
-  });
+  (function cli(){
+    var details = document.getElementById("cli");
+    var link = document.getElementById("cli-link");
+    if(!details) return;
+    function reveal(smooth){
+      details.open = true;
+      details.scrollIntoView({behavior: smooth ? "smooth" : "auto", block:"start"});
+    }
+    function fromHash(){
+      if(location.hash === "#cli" || location.hash === "#path-b") reveal(false);
+    }
+    if(link){
+      link.addEventListener("click", function(e){
+        e.preventDefault();
+        if(history.replaceState) history.replaceState(null, "", "#cli");
+        reveal(true);
+        details.querySelector("summary").focus({preventScroll:true});
+      });
+    }
+    window.addEventListener("hashchange", fromHash);
+    fromHash();
+  })();
 
   /* ---------------------------------------------------------
      6.2 Platform tab bar — WAI-ARIA Tabs pattern (roving tabindex,
-     arrow-key + Home/End navigation, activate on selection).
+     arrow-key + Home/End navigation, activate on selection). The last
+     pick is remembered per browser so a returning visitor lands on it.
      --------------------------------------------------------- */
   (function tabs(){
     var tablist = document.querySelector(".tablist");
     if(!tablist) return;
     var tabEls = Array.prototype.slice.call(tablist.querySelectorAll(".tab"));
+    var STORE_KEY = "ss-install-tab";
 
-    function select(tab){
+    function select(tab, noFocus){
       tabEls.forEach(function(t){
         var isSelected = t === tab;
         t.setAttribute("aria-selected", isSelected ? "true" : "false");
@@ -749,8 +805,14 @@ Our organization is committed to achieving net-zero emissions by 2050 through am
         var panel = document.getElementById(t.getAttribute("aria-controls"));
         if(panel) panel.hidden = !isSelected;
       });
-      tab.focus();
+      if(!noFocus) tab.focus();
+      try { localStorage.setItem(STORE_KEY, tab.id); } catch(e){}
     }
+
+    var saved = null;
+    try { saved = localStorage.getItem(STORE_KEY); } catch(e){}
+    var savedTab = saved && document.getElementById(saved);
+    if(savedTab && tabEls.indexOf(savedTab) !== -1) select(savedTab, true);
 
     tabEls.forEach(function(tab, i){
       tab.addEventListener("click", function(){ select(tab); });

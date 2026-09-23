@@ -1,6 +1,6 @@
 // POST /api/remind — "finish on a computer" reminder from install.html's
-// phone panel. None of the Path A clients (ChatGPT, Claude, Gemini Spark,
-// Gemini Enterprise) let you add a skill from a phone, so a visitor who
+// phone panel. None of the web/desktop clients (ChatGPT, Claude, Gemini
+// Spark, Gemini Enterprise) let you add a skill from a phone, so a visitor who
 // opens their access link on mobile can ask for the same link to be emailed
 // back to them — now, or scheduled for when they'll be at a computer.
 //

@@ -89,11 +89,12 @@ re-issue tooling, the feedback-consent export — see "Ops runbook" below).
   unlike the confirm token, so no single-use/replay check), logs the view and bumps the
   token's usage counters (`lib/accessLog.js`), and serves `install.html`'s content. An
   invalid/expired/revoked token redirects to `access-expired.html` instead (FR-5.5).
-- `install.html` — the real install page content (FR-6): path selection, the platform
-  tab bar and package downloads (Path A), the CLI terminal block (Path B), the
+- `install.html` — the real install page content (FR-6): the default web/desktop
+  install (platform tab bar, each tab with its own package download and upload steps),
+  the CLI terminal block in a collapsed "Advanced" disclosure (`#cli`), the
   verification prompt, and a troubleshooting accordion. Reads its own access token out
   of `location.pathname` client-side (the URL stays `/access/<token>` — it's a rewrite,
-  not a redirect) to build its two download links.
+  not a redirect) to build its download links.
 - `api/access-download.js` — FR-5.2/5.3, the token-gated package download route
   (`?t=<token>&variant=standard|claude`). Same token check as `api/access.js`, then
   streams the requested `.zip` from private Vercel Blob storage — see "Package storage"
