@@ -1,8 +1,17 @@
-// GET /api/confirm?t=<signed token> — FR-2.2/FR-2.3, FR-3.1, FR-4.1/4.2
+// GET|POST /api/confirm — FR-2.2/FR-2.3, FR-3.1, FR-4.1/4.2
 //
 // One-step confirm-and-install: the link in the (only) signup email both
-// confirms the address and lands the visitor on their install page. On a
-// valid click it records the confirmation, auto-approves (Q1/FR-3.1: no
+// confirms the address and lands the visitor on their install page.
+//
+// The emailed link (GET ?t=<signed token>) only shows a "Continue to install"
+// page (confirm-continue.html); it changes nothing. Pressing the button POSTs
+// the token back here, and THAT is the confirmation. Mail-security scanners
+// open emailed links on their own — Microsoft Defender was seen fully opening
+// the link 6 seconds after send and confirming contacts before any person
+// had seen the email — but they don't submit forms, so splitting it this way
+// keeps the double opt-in a record of a human click.
+//
+// On a valid POST it records the confirmation, auto-approves (Q1/FR-3.1: no
 // manual review for Alpha/Climate Week, gated through lib/approval.js so that
 // can change later without touching this file), issues a 90-day access token,
 // and redirects straight to /access/<token>. There is no separate
@@ -14,17 +23,17 @@
 // once approved") and the install-access email is sent on approval instead
 // (scripts/reissue-access.mjs).
 //
-// Replays resolve to the install page, not an error. Many mail clients
-// (Outlook Safe Links, Apple Mail Privacy Protection, link-preview bots)
-// GET-fetch links before a human ever clicks, which consumes a naively
-// single-use token before the real click — and because this email is now the
-// one people keep, they'll also reopen it days later. So a confirm token
-// whose contact is already confirmed redirects to the access token that this
+// Replays resolve to the install page, not an error: this email is the one
+// people keep, so they'll reopen it days later, and double-submits happen.
+// Once a contact is confirmed, a GET or POST with their confirm token skips
+// the button and redirects to the access token that this
 // confirmation issued (re-signed — see lib/accessToken.js#signAccessToken),
 // for as long as that access token is live. If it has been revoked or has
 // expired, the replay goes to access-expired.html: a link re-issued to the
 // owner later (scripts/reissue-access.mjs) is deliberately NOT reachable
 // through an old confirm link, so revoking a leaked link actually sticks.
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { prisma } from "../lib/prisma.js";
 import { decodeAndVerifyToken } from "../lib/tokens.js";
 import { isLiveAccessToken, signAccessToken, issueAccessToken } from "../lib/accessToken.js";
@@ -36,9 +45,29 @@ import { shouldAutoApprove } from "../lib/approval.js";
 // matching a confirmation to the access token it issued.
 const ISSUE_MATCH_SKEW_MS = 60 * 1000;
 
-function redirect(res, path) {
-  res.writeHead(302, { Location: path });
+function redirect(res, location, status = 302) {
+  res.writeHead(status, { Location: location });
   res.end();
+}
+
+let continueTemplate;
+function continuePage(tokenString) {
+  // Cached across warm invocations, same as api/access.js's install.html.
+  if (!continueTemplate) {
+    continueTemplate = readFileSync(path.join(process.cwd(), "confirm-continue.html"), "utf8");
+  }
+  const oneStep = shouldAutoApprove();
+  // The token has already passed signature verification, so it's
+  // base64url + "." — no characters that need escaping in an attribute.
+  return continueTemplate
+    .replace("{{TOKEN}}", () => tokenString)
+    .replace(
+      "{{BODY}}",
+      oneStep
+        ? "Confirm it's you and we'll take you straight to your Speak Sustainability install instructions."
+        : "Confirm it's you, and we'll email your install link once your pilot access is approved."
+    )
+    .replace("{{BUTTON}}", oneStep ? "Continue to install" : "Confirm my email");
 }
 
 /**
@@ -46,13 +75,13 @@ function redirect(res, path) {
  * install page if approved, confirmed.html if still awaiting review. Used by
  * both the first click and every replay, so they can't drift apart.
  */
-async function routeConfirmedContact(res, contact, confirmedAt) {
+async function routeConfirmedContact(res, contact, confirmedAt, status = 302) {
   if (contact.markedForDeletionAt) {
-    redirect(res, "/access-expired.html");
+    redirect(res, "/access-expired.html", status);
     return;
   }
   if (contact.reviewStatus !== "approved") {
-    redirect(res, "/confirmed.html");
+    redirect(res, "/confirmed.html", status);
     return;
   }
 
@@ -69,10 +98,10 @@ async function routeConfirmedContact(res, contact, confirmedAt) {
 
   if (issued) {
     if (!isLiveAccessToken(issued)) {
-      redirect(res, "/access-expired.html");
+      redirect(res, "/access-expired.html", status);
       return;
     }
-    redirect(res, `/access/${signAccessToken(issued)}`);
+    redirect(res, `/access/${signAccessToken(issued)}`, status);
     return;
   }
 
@@ -87,58 +116,86 @@ async function routeConfirmedContact(res, contact, confirmedAt) {
     where: { id: contact.id },
     data: { installEmailSentAt: contact.installEmailSentAt ?? new Date() },
   });
-  redirect(res, `/access/${token}`);
+  redirect(res, `/access/${token}`, status);
+}
+
+/**
+ * Looks up a confirm token and classifies it:
+ *   "invalid"   bad signature, unknown, revoked, expired, or used without confirming
+ *   "confirmed" its contact is already confirmed (replay — route them on)
+ *   "fresh"     valid and unused — needs the button press to confirm
+ */
+async function loadConfirmToken(tokenString) {
+  const payload = tokenString ? decodeAndVerifyToken(tokenString, "confirm") : null;
+  if (!payload) return { state: "invalid" };
+
+  const tokenRow = await prisma.token.findUnique({
+    where: { id: payload.tid },
+    include: { contact: true },
+  });
+  if (!tokenRow || tokenRow.kind !== "confirm" || tokenRow.contactId !== payload.cid) {
+    return { state: "invalid" };
+  }
+  if (tokenRow.usedAt && tokenRow.contact.consentConfirmedAt) {
+    return { state: "confirmed", tokenRow };
+  }
+  if (tokenRow.usedAt || tokenRow.revokedAt || tokenRow.expiresAt.getTime() <= Date.now()) {
+    return { state: "invalid" };
+  }
+  return { state: "fresh", tokenRow };
+}
+
+function firstString(v) {
+  const s = Array.isArray(v) ? v[0] : v;
+  return typeof s === "string" ? s : "";
 }
 
 export default async function handler(req, res) {
-  // Mail-security scanners (Microsoft Defender Safe Links among them) probe
-  // emailed links with HEAD before delivery. Answer with a plain 200 and do
-  // nothing else — a HEAD must never confirm, consume a token, or issue
-  // access — rather than a 405 that could read as a suspicious link.
+  // Mail-security scanners probe emailed links with HEAD before delivery.
+  // Answer with a plain 200 and nothing else rather than a 405 that could
+  // read as a suspicious link.
   if (req.method === "HEAD") {
     res.status(200).end();
     return;
   }
-  if (req.method !== "GET") {
-    res.setHeader("Allow", "GET");
+  if (req.method !== "GET" && req.method !== "POST") {
+    res.setHeader("Allow", "GET, POST");
     res.status(405).end();
     return;
   }
 
-  const raw = req.query?.t;
-  const tokenString = Array.isArray(raw) ? raw[0] : raw;
-
-  const payload = tokenString ? decodeAndVerifyToken(tokenString, "confirm") : null;
-  if (!payload) {
-    redirect(res, "/confirm-expired.html");
-    return;
-  }
+  const isPost = req.method === "POST";
+  // POST comes from confirm-continue.html's form (urlencoded, which Vercel
+  // parses into req.body); GET is the emailed link.
+  const tokenString = isPost ? firstString(req.body?.t) : firstString(req.query?.t);
+  // After a POST, 303 so the browser follows with a GET.
+  const status = isPost ? 303 : 302;
 
   try {
-    const tokenRow = await prisma.token.findUnique({
-      where: { id: payload.tid },
-      include: { contact: true },
-    });
+    const { state, tokenRow } = await loadConfirmToken(tokenString);
 
-    if (!tokenRow || tokenRow.kind !== "confirm" || tokenRow.contactId !== payload.cid) {
-      redirect(res, "/confirm-expired.html");
+    if (state === "invalid") {
+      redirect(res, "/confirm-expired.html", status);
       return;
     }
 
-    // Replay of a token that DID successfully confirm its contact — route
-    // them on, not to "expired" (see file header).
-    if (tokenRow.usedAt && tokenRow.contact.consentConfirmedAt) {
+    if (state === "confirmed") {
       try {
-        await routeConfirmedContact(res, tokenRow.contact, tokenRow.usedAt);
+        await routeConfirmedContact(res, tokenRow.contact, tokenRow.usedAt, status);
       } catch (err) {
         console.error("[api/confirm] routing replay failed", err);
-        redirect(res, "/confirmed.html?retry=1");
+        redirect(res, "/confirmed.html?retry=1", status);
       }
       return;
     }
 
-    if (tokenRow.usedAt || tokenRow.revokedAt || tokenRow.expiresAt.getTime() <= Date.now()) {
-      redirect(res, "/confirm-expired.html");
+    if (!isPost) {
+      // Fresh token on the emailed link: show the button, change nothing.
+      res.setHeader("Content-Type", "text/html; charset=utf-8");
+      res.setHeader("Cache-Control", "no-store");
+      res.setHeader("X-Robots-Tag", "noindex, nofollow");
+      res.setHeader("Referrer-Policy", "no-referrer");
+      res.status(200).send(continuePage(tokenString));
       return;
     }
 
@@ -170,13 +227,13 @@ export default async function handler(req, res) {
     // confirmed/approved either way, and because no access token exists yet,
     // the next click on the same link (a replay) issues one and continues.
     try {
-      await routeConfirmedContact(res, contact, now);
+      await routeConfirmedContact(res, contact, now, status);
     } catch (err) {
       console.error("[api/confirm] access issuance failed after confirm", err);
-      redirect(res, "/confirmed.html?retry=1");
+      redirect(res, "/confirmed.html?retry=1", status);
     }
   } catch (err) {
     console.error("[api/confirm] error", err);
-    redirect(res, "/confirm-expired.html");
+    redirect(res, "/confirm-expired.html", status);
   }
 }

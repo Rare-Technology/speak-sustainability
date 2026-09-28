@@ -80,7 +80,10 @@ re-issue tooling, the feedback-consent export — see "Ops runbook" below).
   `Contact`, and emails a signed confirm link (first use within 7 days) via Resend —
   the only email in the flow. An already-confirmed contact who resubmits is re-sent
   their install link instead (`lib/email.js#sendInstallAccessEmail`).
-- `api/confirm.js` — verifies the link, sets `consentConfirmedAt`, and auto-approves
+- `api/confirm.js` — opening the emailed link (GET) only shows a "Continue to install"
+  page (`confirm-continue.html`, filled in server-side), so mail-security scanners
+  that open links can't confirm anyone. Pressing the button (POST) verifies the
+  token, sets `consentConfirmedAt`, and auto-approves
   (`lib/approval.js` — a config flag, `AUTO_APPROVE_CONTACTS`, not hardcoded, so
   switching to manual review later doesn't touch this file). On approval it issues a
   90-day signed access token and redirects straight to `/access/<token>` — one step,
