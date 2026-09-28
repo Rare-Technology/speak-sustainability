@@ -550,6 +550,7 @@
   .signup-head .section-heading{max-width:720px}   /* ~2/3 of the content width; fills the column when narrower */
   .signup-head .lead-strong{color:var(--rare-color-action-primary)}
   .waitlist{max-width:720px;margin-inline:auto;display:grid;gap:var(--rare-space-5)}
+  .waitlist[hidden]{display:none}
   .field{display:flex;flex-direction:column;gap:var(--rare-space-2)}
   .field label{
     font-family:var(--rare-font-family-display);font-weight:var(--rare-font-weight-bold);
@@ -602,6 +603,64 @@
   .form-status{font-size:var(--rare-font-size-300);font-weight:var(--rare-font-weight-semibold);color:var(--rare-color-action-primary)}
   .form-status--error{color:var(--rare-color-feedback-error)}
   .form-status:empty{display:none}
+
+  /* Post-submit state — the heading + form are swapped out for this panel so
+     "we got it, now go to your inbox" is the only thing in the section. */
+  .signup-done{
+    max-width:720px;margin-inline:auto;
+    background:var(--rare-color-background-default);
+    border:var(--rare-border-width-default) solid var(--rare-color-border-default);
+    border-top:6px solid var(--rare-color-action-primary);
+    border-radius:var(--rare-radius-card);
+    padding:var(--rare-space-9) var(--rare-space-6);
+    text-align:center;
+    animation:signup-done-in var(--rare-motion-duration-slow, 400ms) var(--rare-motion-easing-standard, ease-out) both;
+  }
+  @media (min-width:640px){.signup-done{padding-inline:var(--rare-space-9)}}
+  @keyframes signup-done-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+  .signup-done-icon{
+    width:80px;height:80px;margin:0 auto var(--rare-space-5);
+    border-radius:var(--rare-radius-pill);
+    background:var(--rare-color-action-primary);color:var(--rare-color-text-on-brand);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .signup-done-icon svg{width:40px;height:40px}
+  .signup-done-heading{
+    font-family:var(--rare-font-family-display);font-weight:var(--rare-font-weight-bold);
+    font-size:var(--rare-font-size-700);line-height:var(--rare-line-height-tight);
+    color:var(--rare-color-text-default);margin-bottom:var(--rare-space-4);
+  }
+  .signup-done-heading:focus{outline:none}
+  .signup-done-lede{font-size:var(--rare-font-size-400);color:var(--rare-color-text-default);max-width:46ch;margin:0 auto var(--rare-space-7)}
+  .signup-done-lede strong{overflow-wrap:anywhere}
+  .signup-steps{
+    list-style:none;display:grid;gap:var(--rare-space-3);
+    text-align:left;max-width:480px;margin:0 auto var(--rare-space-7);
+  }
+  .signup-step{
+    display:flex;align-items:flex-start;gap:var(--rare-space-4);
+    padding:var(--rare-space-4);border-radius:var(--rare-radius-md);
+    color:var(--rare-color-text-muted);font-size:var(--rare-font-size-300);
+  }
+  .signup-step strong{display:block;color:var(--rare-color-text-default);font-size:var(--rare-font-size-400)}
+  .signup-step-mark{
+    flex:0 0 auto;width:28px;height:28px;border-radius:var(--rare-radius-pill);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:var(--rare-font-weight-bold);font-size:var(--rare-font-size-200);
+    border:var(--rare-border-width-strong) solid var(--rare-color-border-strong);
+    color:var(--rare-color-text-muted);
+  }
+  .signup-step-mark svg{width:16px;height:16px}
+  .signup-step--done .signup-step-mark{background:var(--rare-color-action-primary);border-color:var(--rare-color-action-primary);color:var(--rare-color-text-on-brand)}
+  .signup-step--current{background:var(--rare-color-background-muted);outline:var(--rare-border-width-strong) solid var(--rare-color-action-primary)}
+  .signup-step--current .signup-step-mark{border-color:var(--rare-color-action-primary);color:var(--rare-color-action-primary)}
+  .signup-done-help{font-size:var(--rare-font-size-300);color:var(--rare-color-text-muted);max-width:46ch;margin-inline:auto}
+  .signup-done-reset{
+    background:none;border:none;padding:0;cursor:pointer;font:inherit;
+    color:var(--rare-color-action-primary);text-decoration:underline;text-underline-offset:2px;
+  }
+  .signup-done-reset:hover{text-decoration:none}
+  @media (prefers-reduced-motion:reduce){.signup-done{animation:none}}
 
   /* ============================================================
      §6  FOOTER
@@ -1170,6 +1229,35 @@
         </div>
         <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
       </form>
+
+      <div class="signup-done" id="signup-done" hidden>
+        <div class="signup-done-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M3.5 6.5 12 13l8.5-6.5" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+        </div>
+        <h2 class="signup-done-heading" id="signup-done-heading" tabindex="-1">Check your inbox</h2>
+        <p class="signup-done-lede">
+          We sent a link to <strong id="signup-done-email">your email</strong>.
+          Click it to confirm your address and go straight to your install instructions.
+        </p>
+        <ol class="signup-steps">
+          <li class="signup-step signup-step--done">
+            <span class="signup-step-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span><strong>Request received</strong><span class="visually-hidden"> (done)</span></span>
+          </li>
+          <li class="signup-step signup-step--current" aria-current="step">
+            <span class="signup-step-mark" aria-hidden="true">2</span>
+            <span><strong>Click the link in your email</strong>Look for “Confirm your email to install Speak Sustainability” and click the button.</span>
+          </li>
+          <li class="signup-step">
+            <span class="signup-step-mark" aria-hidden="true">3</span>
+            <span><strong>Install Speak Sustainability</strong>The link opens your install instructions. Setup takes about two minutes on a laptop or desktop.</span>
+          </li>
+        </ol>
+        <p class="signup-done-help">
+          Not there in a few minutes? Check your spam or promotions folder.
+          Wrong address? <button type="button" class="signup-done-reset" id="signup-done-reset">Use a different email</button>
+        </p>
+      </div>
     </div>
   </section>
 </main>
@@ -1352,6 +1440,30 @@
     if(renderedAtField) renderedAtField.value = String(Date.now());
 
     var submitBtn = form.querySelector('button[type="submit"]');
+    var head = document.querySelector(".signup-head");
+    var done = document.getElementById("signup-done");
+    var doneHeading = document.getElementById("signup-done-heading");
+    var doneEmail = document.getElementById("signup-done-email");
+    var resetBtn = document.getElementById("signup-done-reset");
+
+    // Success swaps the whole section over to the "check your inbox" panel,
+    // scrolls it into view, and moves focus to its heading so screen readers
+    // announce it.
+    function showDone(email){
+      if(!done) return;
+      doneEmail.textContent = email;
+      form.hidden = true;
+      if(head) head.hidden = true;
+      done.hidden = false;
+      document.getElementById("signup").scrollIntoView({block:"start"});
+      doneHeading.focus({preventScroll:true});
+    }
+    if(resetBtn) resetBtn.addEventListener("click", function(){
+      done.hidden = true;
+      form.hidden = false;
+      if(head) head.hidden = false;
+      document.getElementById("email").focus();
+    });
 
     form.addEventListener("submit", function(e){
       e.preventDefault();
@@ -1394,9 +1506,10 @@
           return;
         }
         status.classList.remove("form-status--error");
-        status.textContent = "Check your inbox to confirm your email — then we'll be in touch about pilot access.";
+        status.textContent = "";
         form.reset();
         if(renderedAtField) renderedAtField.value = String(Date.now());
+        showDone(payload.email);
       }).catch(function(){
         status.classList.add("form-status--error");
         status.textContent = "Something went wrong — please try again.";

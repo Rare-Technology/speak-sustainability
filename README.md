@@ -77,13 +77,16 @@ package downloads are all built, as is Phase 4 (scheduled purge jobs, revoke/era
 re-issue tooling, the feedback-consent export — see "Ops runbook" below).
 
 - `api/signup.js` — validates + rate-limits (5/hour per IP and per email), upserts a
-  `Contact`, and emails a 30-minute signed confirm link via Resend.
+  `Contact`, and emails a signed confirm link (first use within 7 days) via Resend —
+  the only email in the flow. An already-confirmed contact who resubmits is re-sent
+  their install link instead (`lib/email.js#sendInstallAccessEmail`).
 - `api/confirm.js` — verifies the link, sets `consentConfirmedAt`, and auto-approves
   (`lib/approval.js` — a config flag, `AUTO_APPROVE_CONTACTS`, not hardcoded, so
   switching to manual review later doesn't touch this file). On approval it issues a
-  90-day signed access token and sends the install-access email
-  (`lib/email.js#sendInstallAccessEmail`), then redirects to `confirmed.html` or
-  `confirm-expired.html`.
+  90-day signed access token and redirects straight to `/access/<token>` — one step,
+  no second email. Later clicks on the same confirm link go back to that install page
+  while its access token is live (`access-expired.html` once revoked/expired). Otherwise
+  it redirects to `confirmed.html` (manual review) or `confirm-expired.html`.
 - `api/access.js` — FR-5.1, the real `/access/:token` handler (`vercel.json` rewrites
   the path here). Verifies the access token server-side (`lib/accessToken.js` — multi-use,
   unlike the confirm token, so no single-use/replay check), logs the view and bumps the
@@ -196,8 +199,10 @@ first is not paranoia, it's the only rehearsal available.
 they are not interchangeable:
 
 - `access:revoke --all` is the normal answer. It writes `Token.revokedAt` per token —
-  auditable, effective on the next request, no redeploy, and it leaves in-flight
-  30-minute confirm links alone so people mid-signup aren't stranded.
+  auditable, effective on the next request, no redeploy, and it leaves unused
+  confirm links alone so people mid-signup aren't stranded. A used confirm link only
+  points at the access token its click issued, so revoking that token also stops the
+  confirm link from reaching the install page.
 - Rotating `CONFIRM_TOKEN_SECRET` in Vercel is the **break-glass** for the different
   case where the signing secret itself leaked and no signature can be trusted any more.
   It invalidates confirm *and* access tokens instantly and needs a redeploy. Afterwards,
