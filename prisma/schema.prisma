@@ -38,7 +38,7 @@ enum ReviewStatus {
 }
 
 enum TokenKind {
-  confirm // confirms once, first use within 7 days — then only points at the access token it issued
+  confirm // single-use, 30 min — double opt-in email confirmation (Phase 1)
   access // multi-use, 90 days — gated install-page link (Phase 2, not issued yet)
 }
 
@@ -64,9 +64,7 @@ model Contact {
   // --- Review / approval (FR-3.1/FR-3.3 — deferred, but the toggle exists now) ---
   reviewStatus ReviewStatus @default(pending)
 
-  // --- Install link delivered (FR-4.1). Name predates the one-step flow: set when
-  // the contact is first given their install link — by the confirm-click redirect
-  // (api/confirm.js) or by email (api/signup.js resend, scripts/reissue-access.mjs). ---
+  // --- Install-access email (FR-4.2/FR-4.3, set in api/confirm.js on send) ---
   installEmailSentAt DateTime?
 
   // --- Abuse signals (salted hashes only — never raw IP) ---
