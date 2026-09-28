@@ -117,8 +117,8 @@
       <p class="status-eyebrow">Link expired</p>
       <h1 class="status-heading">That confirmation link isn't valid anymore.</h1>
       <p class="status-body">
-        Confirmation links expire if they aren't used within 7 days. Enter
-        your email below and we'll send you a fresh link.
+        Confirmation links expire after 30 minutes, or may have already been
+        used. Enter your email below and we'll send a fresh one.
       </p>
 
       <form class="resend-form" id="resend-form" novalidate>
@@ -198,7 +198,7 @@
         return;
       }
       status.classList.remove("resend-status--error");
-      status.textContent = "Check your inbox — we've sent you a new link.";
+      status.textContent = "Check your inbox for a new confirmation link.";
       form.reset();
     }).catch(function(){
       status.classList.add("resend-status--error");

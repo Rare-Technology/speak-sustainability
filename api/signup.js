@@ -8,17 +8,11 @@
 // honeypot-tripped, too-fast-fill) so the endpoint doesn't leak whether an
 // email is already registered. Only rate-limit / hard validation errors get
 // a distinguishable (4xx) response.
-//
-// An already-confirmed contact who submits again is almost always someone who
-// lost their email — so instead of sending nothing, they're re-sent their
-// install link (see resendInstallLink below). The response is identical
-// either way, and it only ever goes to the address that owns the link.
 import { prisma } from "../lib/prisma.js";
 import { hashIp, getClientIp, getUserAgent } from "../lib/hash.js";
 import { isRateLimited, logSignupAttempt } from "../lib/rateLimit.js";
 import { buildConfirmToken, confirmTokenExpiry } from "../lib/tokens.js";
-import { sendConfirmationEmail, sendInstallAccessEmail } from "../lib/email.js";
-import { isLiveAccessToken, signAccessToken, issueAccessToken } from "../lib/accessToken.js";
+import { sendConfirmationEmail } from "../lib/email.js";
 import { CONSENT_TEXT_VERSION } from "../lib/consent.js";
 import { isDisposableEmailDomain } from "../lib/disposableEmail.js";
 
@@ -28,43 +22,6 @@ const MAX_FIELD_LEN = 200;
 
 function genericSuccess(res) {
   res.status(200).json({ ok: true });
-}
-
-/**
- * Re-sends an already-confirmed contact their install link. Reuses their
- * current live access token when there is one (re-signed — same row, same
- * expiry); issues a fresh one only if the last one simply expired. A
- * contact whose latest token was revoked gets nothing: revocation is a
- * deliberate admin action (scripts/revoke-access.mjs), and undoing it is
- * scripts/reissue-access.mjs's job, not the public form's.
- */
-async function resendInstallLink(contact) {
-  if (contact.markedForDeletionAt || contact.reviewStatus !== "approved") return;
-
-  const latest = await prisma.token.findFirst({
-    where: { contactId: contact.id, kind: "access" },
-    orderBy: { issuedAt: "desc" },
-  });
-  if (latest?.revokedAt) return;
-
-  if (latest && isLiveAccessToken(latest)) {
-    await sendInstallAccessEmail({ to: contact.email, token: signAccessToken(latest) });
-    return;
-  }
-
-  // Same send-then-keep ordering as scripts/reissue-access.mjs: a token nobody
-  // received is revoked rather than left behind as a live, ownerless credential.
-  const { row, token } = await issueAccessToken(contact.id);
-  try {
-    await sendInstallAccessEmail({ to: contact.email, token });
-  } catch (err) {
-    await prisma.token.update({ where: { id: row.id }, data: { revokedAt: new Date() } });
-    throw err;
-  }
-  await prisma.contact.update({
-    where: { id: contact.id },
-    data: { installEmailSentAt: new Date() },
-  });
 }
 
 function trim(v) {
@@ -181,8 +138,6 @@ export default async function handler(req, res) {
       const signedToken = buildConfirmToken({ tokenId: tokenRow.id, contactId: contact.id, expiresAt });
 
       await sendConfirmationEmail({ to: email, token: signedToken });
-    } else {
-      await resendInstallLink(contact);
     }
 
     genericSuccess(res);

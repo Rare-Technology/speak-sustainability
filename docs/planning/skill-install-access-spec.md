@@ -24,9 +24,10 @@ So "monitoring usage" here can only mean **top-of-funnel visibility**: who signe
 
 ```
 Visitor fills out waitlist form (email + role/org optional + consent checkboxes)
-  → confirmation email (the only email; link valid 7 days)
-    → clicks → confirmed + auto-approved (Alpha & Climate Week — no manual review; revisit post-launch)
-      → 90-day access token issued, redirected straight to it (no second email — 2026-09-28)
+  → double opt-in confirmation email (30 min expiry)
+    → confirms → auto-approve (Alpha & Climate Week — no manual review; revisit post-launch)
+      → install-access email sent (signed link, 90-day expiry)
+        → recipient opens link
           → gated install page + gated package download (token verified server-side, noindex, no crawlers)
             → Step 1: choose path — LLM Clients vs CLI Agents
               → Path A: download package (token-gated) + ChatGPT/Claude/Gemini/Enterprise tabs
@@ -58,8 +59,8 @@ Reuses the existing `#waitlist-form` in `index.html` (currently stubbed to `cons
 | ID | Requirement | Priority |
 |---|---|---|
 | FR-2.1 | Send confirmation email within seconds of signup, containing a single-use signed token (email + timestamp + nonce, HMAC-signed). | Must |
-| FR-2.2 | Token must be first used within **7 days** (was 30 minutes — changed 2026-09-28 with the one-step flow, since this is now the only email). Expired never-used tokens show a friendly re-request page, never a raw error. A reused token whose contact already confirmed routes on as in FR-2.3, not to "expired." | Must |
-| FR-2.3 | Opening the emailed link shows a "Continue to install" page and changes nothing; pressing its button (a POST) is the confirmation. Added 2026-09-28 after Microsoft Defender was seen opening links seconds after delivery and confirming contacts before any person had seen the email — scanners open links but don't submit forms. The button press records `consent_confirmed_at` (timestamp) + IP/user-agent hash, then — when approved (FR-3.1) — redirects straight to the contact's gated install page. Later clicks on the same link go back to that install page while the access token it issued is live; if that token has been revoked or has expired, they go to the access-expired page (a re-issued link is never reachable through an old confirm link). With manual review on, the click lands on a "confirmed — we'll email you once approved" page instead. | Must |
+| FR-2.2 | Token expires after 30 minutes; expired/reused tokens show a friendly re-request page, never a raw error. | Must |
+| FR-2.3 | Clicking the link records `consent_confirmed_at` (timestamp) + IP/user-agent hash, then routes to a "thanks — you're on the list" page. | Must |
 | FR-2.4 | Unconfirmed signups auto-purge after 7 days. | Must |
 
 ### 3 — Review & approval (deferred — not active for Alpha/Climate Week)
@@ -68,7 +69,7 @@ Reuses the existing `#waitlist-form` in `index.html` (currently stubbed to `cons
 
 | ID | Requirement | Priority |
 |---|---|---|
-| FR-3.1 | Confirmation auto-approves — access is granted directly off `consent_confirmed_at` (FR-2.3 redirect), no queue/review step for Alpha/Climate Week. | Must |
+| FR-3.1 | Confirmation auto-approves — access email (§4) fires directly off `consent_confirmed_at`, no queue/review step for Alpha/Climate Week. | Must |
 | FR-3.2 | Confirmed signups still land in a queryable list (spreadsheet export or minimal internal view) even though nothing blocks on it — seed for the post-launch review queue and for spotting abuse to revoke (SEC-7). | Should |
 | FR-3.3 | Build the approval step as an isolated function/flag from the start (e.g. `auto_approve = true`) rather than skipping the code path — turning on manual review later should be a config flip. | Should |
 | FR-3.4 | Log simple heuristic flags (disposable-email domain, duplicate signup from same IP in a short window) even without blocking, for later action. | Could |
@@ -77,7 +78,7 @@ Reuses the existing `#waitlist-form` in `index.html` (currently stubbed to `cons
 
 | ID | Requirement | Priority |
 |---|---|---|
-| FR-4.1 | ~~Separate email from confirmation, sent automatically right after confirmation.~~ **Changed 2026-09-28:** user testing showed the second email was where signups were abandoned, so the confirm click now opens the install page directly (FR-2.3). The install-access email (signed install-page link + one-paragraph recap) is now sent only when (a) an already-confirmed contact resubmits the signup form ("I lost the email"), (b) support re-issues a link (`npm run access:reissue`), or (c) a contact is approved under manual review. | Must |
+| FR-4.1 | Separate email from confirmation, sent automatically right after confirmation (no approval wait), containing the signed install-page link + one-paragraph recap. | Must |
 | FR-4.2 | Access token is long-lived — **90 days** (Decided, Q2) — scoped to a single email address, individually revocable. | Must |
 | FR-4.3 | Send via **Resend** (Decided, Q3), from **`speaksustainability.org`** — SPF/DKIM/DMARC records for that domain are the ones going to Rare IT (ticket #9749), currently pending propagation. `RESEND_FROM_EMAIL` is `hello@speaksustainability.org`, already set in Vercel Production and local `.env`. (`rare.org` was the original plan but was dropped: `speaksustainability.org` avoids `rare.org`'s existing SPF record entirely, matches the "Speak Sustainability" display name from Q9, and keeps this ticket's DNS changes in the one zone already being touched for the Vercel cutover — no cross-domain ambiguity.) | Must |
 | FR-4.4 | Footer contact address: **`bschauer@rare.org`** for alpha (Decided, Q5). Swap to a team-owned inbox before Climate Week launch, and reassess again after. | Must |
@@ -153,7 +154,7 @@ Every email's **display name** is `"Speak Sustainability"` (the pilot brand the 
 |---|---|
 | `token_id` | Opaque, random |
 | `contact_id` | Owning contact |
-| `kind` | `confirm` (confirms once, first use within 7 days) or `access` (multi-use, 90 days) |
+| `kind` | `confirm` (single-use, 30 min) or `access` (multi-use, 90 days) |
 | `issued_at`, `expires_at` | |
 | `revoked_at` | Manual revoke path for abuse response |
 | `last_used_at`, `use_count` | The only honest "usage" signal available |
@@ -183,7 +184,7 @@ Every email's **display name** is `"Speak Sustainability"` (the pilot brand the 
 | ID | Requirement | Priority |
 |---|---|---|
 | SEC-1 | Tokens HMAC-signed (or JWT) with a server-side secret, rotated periodically; never derived from guessable data. | Must |
-| SEC-2 | Confirmation tokens: first use within 7 days, confirm only once; afterwards they act only as a pointer to the access token that confirmation issued, so they never outlive or bypass its revocation. Access tokens long-lived but individually revocable. | Must |
+| SEC-2 | Confirmation tokens single-use/short-lived (30 min); access tokens long-lived but individually revocable. | Must |
 | SEC-3 | HTTPS everywhere; secrets in the hosting platform's secret manager, never committed. | Must |
 | SEC-4 | Rate-limit signup endpoint AND token-verification endpoint. | Must |
 | SEC-5 | **Decided (Q4):** package download lives behind the same token check as the instructions page (FR-5.2/5.3). | Must |
@@ -224,9 +225,9 @@ Provisioning a **new project under the same Supabase org** gets the best of both
 
 All three emails: **From** display name `"Speak Sustainability"` (Decided, Q9).
 
-**1. Confirmation email** — Trigger: immediately on signup submit. Subject: "Confirm your email to install Speak Sustainability." Body: one line of context, one button ("Confirm & get install instructions") that confirms and opens the install page, "keep this email — it takes you back to your install page for 90 days; don't forward it", 7-day first-use note, footer with privacy-notice link + "didn't request this? ignore this email." (Manual-review mode uses the older "Confirm my email" wording and subject.)
+**1. Confirmation email** — Trigger: immediately on signup submit. Subject: "Confirm your email — Speak Sustainability pilot." Body: one line of context, one button ("Confirm my email"), 30-minute expiry note, footer with privacy-notice link + "didn't request this? ignore this email."
 
-**2. Install-access email** — Trigger: no longer part of the normal flow (see FR-4.1) — sent on "lost the email" resubmits, support re-issues, and manual-review approvals. Subject: "You're in — install Climate Comms Review." Body: two-sentence recap, one button ("Go to install instructions"), note the link is personal and also unlocks the download (Q4), footer with support contact (`bschauer@rare.org` for alpha) + unsubscribe/erasure link.
+**2. Install-access email** — Trigger: immediately on confirmation (no approval wait). Subject: "You're in — install Climate Comms Review." Body: two-sentence recap, one button ("Go to install instructions"), note the link is personal and also unlocks the download (Q4), footer with support contact (`bschauer@rare.org` for alpha) + unsubscribe/erasure link.
 
 **3. Feedback & input request** — Trigger: **manual, ad hoc** — only to contacts with `feedback_consent_given_at` set; not an automated drip. Subject: "Quick question about your experience with Climate Comms Review." Body: plain, specific ask, no pressure framing, footer with an unsubscribe link scoped to feedback requests only. **Scope note:** this is private feedback, not a request to use anyone's words publicly — a public testimonial/quote would need its own explicit, separately-obtained publish-consent later.
 
