@@ -17,6 +17,9 @@
   "functions": {
     "api/access.js": {
       "includeFiles": "install.html"
+    },
+    "api/confirm.js": {
+      "includeFiles": "confirm-continue.html"
     }
   },
   "crons": [
