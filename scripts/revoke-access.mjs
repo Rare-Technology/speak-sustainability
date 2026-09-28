@@ -12,9 +12,11 @@
 // signed token string in the recipient's email still has a valid signature;
 // the DB row is the source of truth, which is exactly why the row exists.
 //
-// Scoped to kind="access" on purpose. Confirm tokens are single-use and live
-// 30 minutes; revoking one only strands somebody mid-signup, and the abuse
-// case this tool exists for is always a shared/leaked install link.
+// Scoped to kind="access" on purpose. Confirm tokens confirm once and must be
+// first used within 7 days; revoking an unused one only strands somebody
+// mid-signup. A used confirm link just points at the access token its click
+// issued (api/confirm.js), so revoking that access token covers it too — a
+// forwarded confirmation email stops working along with the install link.
 //
 // --all vs. rotating CONFIRM_TOKEN_SECRET: both kill every outstanding link.
 // Prefer --all. It leaves an auditable revokedAt timestamp per token, needs

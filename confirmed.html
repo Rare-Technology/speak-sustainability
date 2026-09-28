@@ -96,17 +96,29 @@
       <div class="status-icon" aria-hidden="true">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
+      <!-- Normally nobody sees this page: a confirm click goes straight to the
+           install page (api/confirm.js). It's the landing for manual-review mode
+           (AUTO_APPROVE_CONTACTS=false), and — with ?retry=1 — for a confirm
+           that succeeded but whose install link couldn't be issued; clicking
+           the email link again retries that. -->
       <p class="status-eyebrow">Confirmed</p>
-      <h1 class="status-heading">Email confirmed — one more email coming.</h1>
-      <p class="status-body">
-        A second email with your Speak Sustainability install link is on its
-        way now — usually within a minute or two. Nothing more to do here;
-        that next email is where the actual install instructions start.
+      <h1 class="status-heading" id="confirmed-heading">Your email is confirmed.</h1>
+      <p class="status-body" id="confirmed-body">
+        We'll email your Speak Sustainability install link as soon as your
+        pilot access is approved. Nothing more to do here for now.
       </p>
       <a class="btn btn-primary" href="/">Back to Speak Sustainability</a>
     </div>
   </div>
 </main>
+<script>
+  if (new URLSearchParams(location.search).get("retry")) {
+    document.getElementById("confirmed-heading").textContent = "Your email is confirmed — one more click.";
+    document.getElementById("confirmed-body").textContent =
+      "We couldn't open your install page just now. Click the button in your email again " +
+      "to go straight there. If it still doesn't work, email bschauer@rare.org.";
+  }
+</script>
 
 <footer class="footer">
   <div class="container">
