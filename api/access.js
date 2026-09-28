@@ -32,6 +32,13 @@ function redirectToExpired(res) {
 }
 
 export default async function handler(req, res) {
+  // Same mail-scanner HEAD probe as api/confirm.js — /access links are
+  // emailed too. Plain 200, no token check and no AccessLog row, so probes
+  // don't count as page views.
+  if (req.method === "HEAD") {
+    res.status(200).end();
+    return;
+  }
   if (req.method !== "GET") {
     res.setHeader("Allow", "GET");
     res.status(405).end();

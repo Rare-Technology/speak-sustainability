@@ -91,6 +91,14 @@ async function routeConfirmedContact(res, contact, confirmedAt) {
 }
 
 export default async function handler(req, res) {
+  // Mail-security scanners (Microsoft Defender Safe Links among them) probe
+  // emailed links with HEAD before delivery. Answer with a plain 200 and do
+  // nothing else — a HEAD must never confirm, consume a token, or issue
+  // access — rather than a 405 that could read as a suspicious link.
+  if (req.method === "HEAD") {
+    res.status(200).end();
+    return;
+  }
   if (req.method !== "GET") {
     res.setHeader("Allow", "GET");
     res.status(405).end();
