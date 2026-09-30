@@ -8,6 +8,7 @@ ALTER TABLE "Token" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "SignupAttempt" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "AccessLog" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "WorkshopSurveyResponse" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "FollowUpSurveyResponse" ENABLE ROW LEVEL SECURITY;
 -- Created by `prisma migrate`, not by schema.prisma, so it's easy to miss —
 -- it also lives in `public` and is flagged by Supabase's
 -- rls_disabled_in_public advisor if left out. `prisma migrate deploy` runs

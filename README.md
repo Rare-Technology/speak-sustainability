@@ -228,6 +228,12 @@ never retries a failed cron. Explicitly out of scope for Phase 4; revisit if it 
   `20260922120000_workshop_survey`). There's no email field. Name is optional.
 - Export for Google Sheets: `npm run survey:export > level-up-survey.csv`, then in Sheets
   use File → Import → Upload.
+- `/followup/` is the five-question survey emailed to attendees after the workshop. It
+  posts to `api/followup-survey.js` and redirects to the same resources page. It is
+  anonymous: the `FollowUpSurveyResponse` table (migration
+  `20260929120000_followup_survey`) stores no name and no IP hash, so abuse control is
+  the honeypot plus a global hourly cap rather than a per-IP limit.
+- Export it with `npm run followup:export > level-up-followup.csv`.
 
 ## Assets
 

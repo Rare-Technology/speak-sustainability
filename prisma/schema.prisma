@@ -173,3 +173,23 @@ model WorkshopSurveyResponse {
   @@index([event, createdAt])
   @@index([ipHash, createdAt])
 }
+
+// Follow-up survey emailed to Level Up attendees after the workshop
+// (/followup). Deliberately more anonymous than WorkshopSurveyResponse:
+// no name, no email, and no ipHash — nothing here identifies a respondent
+// or links two submissions. Abuse control is the honeypot plus a global
+// per-hour cap in api/followup-survey.js, which needs no per-visitor key.
+// Exported to CSV for Google Sheets via `npm run followup:export`.
+model FollowUpSurveyResponse {
+  id                   String   @id @default(cuid())
+  event                String
+  biggestObstacle      String?
+  principlesLikelihood Int? // 1 (very unlikely) – 5 (very likely)
+  toolLikelihood       Int? // same scale, asked about speaksustainability.org
+  supportRequest       String?
+  recommendation       String?
+  mostValuable         String?
+  createdAt            DateTime @default(now())
+
+  @@index([event, createdAt])
+}
