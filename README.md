@@ -240,6 +240,11 @@ never retries a failed cron. Explicitly out of scope for Phase 4; revisit if it 
   without affecting saving or exports. A send failure is logged and swallowed — it never
   fails the respondent's submission. Preview the format with
   `npm run survey:test-email -- you@example.org`.
+- `SURVEY_NOTIFY_ATTACH_CSV="false"` sends those notifications without the CSV
+  attachment (answers still in the body). Currently set in production: rare.org's
+  Cloudflare Email Security gateway quarantined the attachment-bearing version on
+  2026-09-30, and the sending domain is too young to have a delivery history there.
+  Flip it back once Rare IT allow-lists the domain.
 
 ## Assets
 

@@ -52,5 +52,6 @@ const result = await sendSurveyResponseEmail({
 console.log(
   result.skipped
     ? "Skipped — no recipients configured."
-    : `Sent to ${process.env.SURVEY_NOTIFY_EMAILS} (${result.sent} recipient(s)).`
+    : `Sent to ${process.env.SURVEY_NOTIFY_EMAILS} (${result.sent} recipient(s), ` +
+      `CSV attachment ${result.attached ? "included" : "omitted"}).`
 );
