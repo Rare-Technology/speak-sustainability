@@ -241,10 +241,12 @@ never retries a failed cron. Explicitly out of scope for Phase 4; revisit if it 
   fails the respondent's submission. Preview the format with
   `npm run survey:test-email -- you@example.org`.
 - `SURVEY_NOTIFY_ATTACH_CSV="false"` sends those notifications without the CSV
-  attachment (answers still in the body). Currently set in production: rare.org's
-  Cloudflare Email Security gateway quarantined the attachment-bearing version on
-  2026-09-30, and the sending domain is too young to have a delivery history there.
-  Flip it back once Rare IT allow-lists the domain.
+  attachment (answers still in the body). Unset in production — the attachment was
+  ruled out as the cause of rare.org quarantining this domain's mail (both versions
+  were accepted at SMTP and held internally by its Cloudflare Email Security gateway,
+  2026-09-30). Kept as a switch in case another recipient's filter objects.
+- Each recipient gets their own copy (`Promise.allSettled`), so organizers don't see
+  each other's addresses and one bad address can't take down the rest of the send.
 
 ## Assets
 
