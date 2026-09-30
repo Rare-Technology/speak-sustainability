@@ -7,6 +7,8 @@
 // entirely empty submission.
 import { prisma } from "../lib/prisma.js";
 import { hashIp, getClientIp } from "../lib/hash.js";
+import { sendSurveyResponseEmail } from "../lib/email.js";
+import { workshopSurvey, toCsv, LIKELIHOOD_LABELS } from "../lib/surveyCsv.js";
 
 const EVENT = "level-up-cwnyc-2026";
 const MAX_TEXT_LEN = 1000;
@@ -18,6 +20,28 @@ const MAX_PER_IP = 300;
 
 function text(v, max) {
   return typeof v === "string" ? v.trim().slice(0, max) || null : null;
+}
+
+/** Same non-throwing organizer notification as api/followup-survey.js. */
+async function notifyOrganizers(saved) {
+  try {
+    const rows = await prisma.workshopSurveyResponse.findMany({ orderBy: { createdAt: "asc" } });
+    await sendSurveyResponseEmail({
+      surveyName: "Level Up workshop survey",
+      subject: `Level Up workshop survey — new response (#${rows.length})`,
+      total: rows.length,
+      csv: toCsv(workshopSurvey, rows),
+      csvFilename: "level-up-survey-responses.csv",
+      answers: [
+        { question: "1. Biggest obstacle for their org to talk more about climate", answer: saved.biggestObstacle },
+        { question: "2. Likelihood of putting the principles / AI tool into practice", answer: saved.likelihood ? `${saved.likelihood} — ${LIKELIHOOD_LABELS[saved.likelihood]}` : null },
+        { question: "3. How TCC could best support them in the next 6 months", answer: saved.supportRequest },
+        { question: "4. Name (optional)", answer: saved.name },
+      ],
+    });
+  } catch (err) {
+    console.error("workshop-survey: response saved but organizer email failed", err);
+  }
 }
 
 export default async function handler(req, res) {
@@ -57,9 +81,10 @@ export default async function handler(req, res) {
       }
     }
 
-    await prisma.workshopSurveyResponse.create({
+    const saved = await prisma.workshopSurveyResponse.create({
       data: { event: EVENT, biggestObstacle, likelihood, supportRequest, name, ipHash },
     });
+    await notifyOrganizers(saved);
     res.status(200).json({ ok: true });
   } catch (err) {
     console.error("workshop-survey: failed to save response", err);

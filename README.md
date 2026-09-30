@@ -234,6 +234,12 @@ never retries a failed cron. Explicitly out of scope for Phase 4; revisit if it 
   `20260929120000_followup_survey`) stores no name and no IP hash, so abuse control is
   the honeypot plus a global hourly cap rather than a per-IP limit.
 - Export it with `npm run followup:export > level-up-followup.csv`.
+- Both surveys email the organizers on every response (`lib/email.js`
+  `sendSurveyResponseEmail`), with the cumulative CSV attached. Recipients come from
+  `SURVEY_NOTIFY_EMAILS` (comma-separated, set in Vercel); empty turns notifications off
+  without affecting saving or exports. A send failure is logged and swallowed — it never
+  fails the respondent's submission. Preview the format with
+  `npm run survey:test-email -- you@example.org`.
 
 ## Assets
 

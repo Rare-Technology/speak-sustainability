@@ -11,6 +11,8 @@
 // (a few dozen invited attendees) a global cap can't plausibly lock out a real
 // respondent, and it self-heals within the hour.
 import { prisma } from "../lib/prisma.js";
+import { sendSurveyResponseEmail } from "../lib/email.js";
+import { followUpSurvey, toCsv, LIKELIHOOD_LABELS } from "../lib/surveyCsv.js";
 
 const EVENT = "level-up-cwnyc-2026-followup";
 const MAX_TEXT_LEN = 1000;
@@ -24,6 +26,39 @@ function text(v) {
 function scale(v) {
   const n = Number(v);
   return Number.isInteger(n) && n >= 1 && n <= 5 ? n : null;
+}
+
+/**
+ * Email the organizers, after the response is safely saved. Deliberately
+ * never throws: a Resend outage or a typo'd recipient must not turn a saved
+ * response into an error page for the respondent, who cannot retry usefully
+ * anyway. A failure is logged and the row is still in the table and the CSV.
+ */
+async function notifyOrganizers(saved) {
+  try {
+    const rows = await prisma.followUpSurveyResponse.findMany({ orderBy: { createdAt: "asc" } });
+    await sendSurveyResponseEmail({
+      surveyName: "Level Up follow-up survey",
+      subject: `Level Up follow-up survey — new response (#${rows.length})`,
+      total: rows.length,
+      csv: toCsv(followUpSurvey, rows),
+      csvFilename: "level-up-followup-responses.csv",
+      answers: [
+        { question: "1. Biggest obstacle to talking more about climate", answer: saved.biggestObstacle },
+        { question: "2a. Likelihood of putting the principles into practice", answer: labelFor(saved.principlesLikelihood) },
+        { question: "2b. Likelihood of putting the AI tool into practice", answer: labelFor(saved.toolLikelihood) },
+        { question: "3. How TCC could best support them in the next 6 months", answer: saved.supportRequest },
+        { question: "4. Would they recommend the boot camp, and to whom", answer: saved.recommendation },
+        { question: "5. Most valuable part of the workshop", answer: saved.mostValuable },
+      ],
+    });
+  } catch (err) {
+    console.error("followup-survey: response saved but organizer email failed", err);
+  }
+}
+
+function labelFor(n) {
+  return n ? `${n} — ${LIKELIHOOD_LABELS[n]}` : null;
 }
 
 export default async function handler(req, res) {
@@ -65,7 +100,8 @@ export default async function handler(req, res) {
       return;
     }
 
-    await prisma.followUpSurveyResponse.create({ data });
+    const saved = await prisma.followUpSurveyResponse.create({ data });
+    await notifyOrganizers(saved);
     res.status(200).json({ ok: true });
   } catch (err) {
     console.error("followup-survey: failed to save response", err);
