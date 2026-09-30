@@ -12,14 +12,32 @@
 <link rel="stylesheet" href="/design-tokens/build/rare-tokens.css" />
 <link rel="stylesheet" href="/level-up/level-up.css" />
 <style>
+  /* Post-submit confirmation. Deliberately the loudest thing on the page —
+     a full-width orange banner in the deck's palette, so someone arriving
+     from the survey can't miss that their answers were received. Navy ink on
+     orange, not white, which would fail contrast at this size. */
   .thanks{
-    display:flex;gap:var(--rare-space-3);align-items:center;
-    margin-bottom:var(--rare-space-5);padding:var(--rare-space-3) var(--rare-space-4);
-    background:var(--rare-color-background-default);border:var(--rare-border-width-default) solid var(--rare-color-border-default);
-    border-radius:var(--rare-radius-md);font-size:var(--rare-font-size-300);font-weight:var(--rare-font-weight-semibold);
+    display:flex;gap:var(--rare-space-4);align-items:center;
+    margin-bottom:var(--rare-space-6);padding:var(--rare-space-5) var(--rare-space-6);
+    background:var(--rare-color-orange-500);color:var(--lu-navy);
+    border-radius:var(--rare-radius-card);
   }
-  .thanks svg{flex:none;color:var(--rare-color-green-500)}
+  .thanks-icon{
+    flex:none;display:flex;align-items:center;justify-content:center;
+    width:44px;height:44px;border-radius:var(--rare-radius-pill);
+    background:var(--lu-navy);color:var(--rare-color-orange-500);
+  }
+  .thanks-title{
+    font-family:var(--rare-font-family-display);font-weight:var(--rare-font-weight-extrabold);
+    font-size:var(--rare-font-size-600);line-height:var(--rare-line-height-tight);
+  }
+  .thanks-sub{font-size:var(--rare-font-size-300);margin-top:var(--rare-space-1)}
   .thanks[hidden]{display:none}
+  @media (max-width:479px){
+    .thanks{gap:var(--rare-space-3);padding:var(--rare-space-4) var(--rare-space-5)}
+    .thanks-icon{width:36px;height:36px}
+    .thanks-title{font-size:var(--rare-font-size-500)}
+  }
 
   .resources{display:grid;gap:var(--rare-space-5)}
   .resource-kicker{
@@ -51,10 +69,15 @@
 
 <main>
   <div class="container">
-    <p class="thanks" id="thanks" role="status" hidden>
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      Thanks — your answers are in.
-    </p>
+    <div class="thanks" id="thanks" role="status" hidden>
+      <span class="thanks-icon" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+      <div>
+        <p class="thanks-title">Thanks — your answers are in.</p>
+        <p class="thanks-sub">Your feedback goes straight to the workshop team.</p>
+      </div>
+    </div>
 
     <section class="lu-hero" aria-labelledby="hero-heading">
       <div class="lu-hero-body">
